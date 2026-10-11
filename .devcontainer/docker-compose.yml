@@ -1,0 +1,22 @@
+services:
+  app:
+    build: .
+    command: bash -c "for p in 54321 54322 54323; do socat TCP-LISTEN:$$p,fork,reuseaddr,bind=127.0.0.1 TCP:host.docker.internal:$$p & done; sleep infinity"
+    volumes:
+      - ..:/workspaces/trabalho-web:cached
+      - node_modules:/workspaces/trabalho-web/src/backend/node_modules
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql://postgres:postgres@localhost:54322/postgres
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+volumes:
+  node_modules:

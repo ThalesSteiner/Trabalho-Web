@@ -1,0 +1,25 @@
+{
+  "name": "Trabalho Web",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/trabalho-web",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false
+    }
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "54321-54323": { "onAutoForward": "ignore" }
+  },
+  "postCreateCommand": "sudo chown node:node src/backend/node_modules && cd src/backend && npm install",
+  "postStartCommand": "cd src/backend && npx supabase start",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
