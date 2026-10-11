@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
 
 @Module({
@@ -14,6 +15,7 @@ import { TracingMiddleware } from './tracing/tracing.middleware';
         autoLoadEntities: true,
       }),
     }),
+    TestModule,
   ],
 })
 export class AppModule implements NestModule {
