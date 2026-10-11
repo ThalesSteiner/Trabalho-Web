@@ -4,6 +4,7 @@
     "target": "ES2022",
     "outDir": "./dist",
     "rootDir": "./src",
+    "sourceMap": true,
     "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

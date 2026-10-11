@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "supabase: start",
+      "type": "shell",
+      "command": "npx supabase start",
+      "options": {
+        "cwd": "${workspaceFolder}/src/backend"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
