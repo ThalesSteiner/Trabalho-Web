@@ -9,14 +9,22 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       DATABASE_URL: postgresql://postgres:postgres@localhost:54322/postgres
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
       - redis
+      - jaeger
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/jaeger:2.21.0
+    restart: unless-stopped
+    ports:
+      - 16686:16686
 
 volumes:
   node_modules:
