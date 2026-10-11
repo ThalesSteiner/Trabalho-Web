@@ -1,0 +1,47 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch"
+  },
+  "dependencies": {
+    "@keyv/redis": "^6.1.0",
+    "@nestjs/bullmq": "^12.0.0",
+    "@nestjs/cache-manager": "^12.0.1",
+    "@nestjs/common": "^12.1.2",
+    "@nestjs/config": "^12.0.1",
+    "@nestjs/core": "^12.1.2",
+    "@nestjs/cqrs": "^12.1.0",
+    "@nestjs/jwt": "^12.0.2",
+    "@nestjs/passport": "^12.0.0",
+    "@nestjs/platform-express": "^12.1.2",
+    "@nestjs/swagger": "^12.0.2",
+    "@nestjs/throttler": "^6.7.1",
+    "@nestjs/typeorm": "^12.0.2",
+    "bcryptjs": "^3.0.3",
+    "bullmq": "^6.3.12",
+    "cache-manager": "^7.2.9",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "keyv": "^6.1.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^1.1.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.8",
+    "@nestjs/schematics": "^12.0.6",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@types/passport-jwt": "^4.0.1",
+    "supabase": "^2.120.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
