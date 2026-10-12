@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 import { databaseConfig } from './database/database.config';
 import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
@@ -16,6 +17,7 @@ import { TracingMiddleware } from './tracing/tracing.middleware';
         migrationsRun: true,
       }),
     }),
+    AuthModule,
     TestModule,
   ],
 })
