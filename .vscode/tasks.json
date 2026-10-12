@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "npx supabase start",
       "options": {
-        "cwd": "${workspaceFolder}/src/backend"
+        "cwd": "${workspaceFolder}/backend"
       },
       "problemMatcher": []
     }

@@ -7,7 +7,7 @@
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start:dev"],
-      "cwd": "${workspaceFolder}/src/backend",
+      "cwd": "${workspaceFolder}/backend",
       "preLaunchTask": "supabase: start",
       "console": "integratedTerminal",
       "autoAttachChildProcesses": true,

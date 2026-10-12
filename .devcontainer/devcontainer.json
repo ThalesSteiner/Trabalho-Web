@@ -12,8 +12,8 @@
   "portsAttributes": {
     "54321-54323": { "onAutoForward": "ignore" }
   },
-  "postCreateCommand": "sudo chown node:node src/backend/node_modules && cd src/backend && npm install",
-  "postStartCommand": "cd src/backend && npx supabase start",
+  "postCreateCommand": "sudo chown node:node backend/node_modules && cd backend && npm install",
+  "postStartCommand": "cd backend && npx supabase start",
   "customizations": {
     "vscode": {
       "extensions": [

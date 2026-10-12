@@ -4,7 +4,7 @@ services:
     command: bash -c "for p in 54321 54322 54323; do socat TCP-LISTEN:$$p,fork,reuseaddr,bind=127.0.0.1 TCP:host.docker.internal:$$p & done; sleep infinity"
     volumes:
       - ..:/workspaces/trabalho-web:cached
-      - node_modules:/workspaces/trabalho-web/src/backend/node_modules
+      - node_modules:/workspaces/trabalho-web/backend/node_modules
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
