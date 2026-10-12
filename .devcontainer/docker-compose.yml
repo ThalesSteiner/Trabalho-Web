@@ -10,6 +10,7 @@ services:
       REDIS_PORT: 6379
       DATABASE_URL: postgresql://postgres:postgres@localhost:54322/postgres
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      JWT_SECRET: troque-essa-chave
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
