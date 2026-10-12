@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { databaseConfig } from './database/database.config';
 import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
 
@@ -10,9 +11,9 @@ import { TracingMiddleware } from './tracing/tracing.middleware';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.getOrThrow<string>('DATABASE_URL'),
+        ...databaseConfig(config.getOrThrow<string>('DATABASE_URL')),
         autoLoadEntities: true,
+        migrationsRun: true,
       }),
     }),
     TestModule,
