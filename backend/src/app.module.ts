@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from './database/database.config';
+import { KnexModule } from './database/knex.module';
 import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
 
@@ -16,6 +17,7 @@ import { TracingMiddleware } from './tracing/tracing.middleware';
         migrationsRun: true,
       }),
     }),
+    KnexModule,
     TestModule,
   ],
 })
