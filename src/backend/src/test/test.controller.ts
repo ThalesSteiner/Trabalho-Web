@@ -55,4 +55,11 @@ export class TestController {
     span.setAttribute('test.id', id);
     this.testService.remove(id);
   }
+
+  @Get(':id')
+  @findnemo(@Param('id', ParseIntPipe) id: number, @Query() query: ListTestDto, @CurrentSpan() span: Span){
+    span.setAttributes({ 'test.page': query.page, 'test.limit': query.limit });
+    return this.testService.findnemo(query,id);
+  }
+  
 }
