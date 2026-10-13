@@ -13,16 +13,16 @@ export class FornecedorController {
   buscarPorId(@Param('id') id: string) { return this.service.buscarPorId(id);}
 
   @Post()
-  criar(@Body() caminho: CriarFornecedorDto) {return this.service.criar(caminho);}
+  criar(@Body() dados: FornecedorEntidade.FornecedorSemId) {return this.service.criar(dados);}
 
   @Put(':id')
-  atualizar(@Param('id') id: string, @Body() caminho: AtualizarFornecedorDto) {
-    return this.service.atualizar(id, caminho);
+  atualizar(@Param('id') id: string, @Body() dados: FornecedorEntidade.FornecedorSemId) {
+    return this.service.atualizar(id, dados);
   }
 
   @Patch(':id')
-  atualizarParcial(@Param('id') id: string,@Body() caminho: AtualizarParcialFornecedorDto) {
-    return this.service.atualizarParcial(id, caminho);
+  atualizarParcial(@Param('id') id: string,@Body() dados: FornecedorEntidade.AtualizarParcialFornecedor) {
+    return this.service.atualizarParcial(id, dados);
   }
 
   @Delete(':id')
