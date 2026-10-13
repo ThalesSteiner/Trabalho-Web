@@ -28,6 +28,10 @@ export class NotaFiscalService {
     return this.repository.salvar({ numero, chaveAcesso, emitidaEm: new Date() }, trx);
   }
 
+  cancelar(id: number, trx: Knex.Transaction) {
+    return this.repository.cancelar(id, trx);
+  }
+
   private async detalhar(nota?: NotaFiscal) {
     if (!nota) throw new NotFoundException('Nota fiscal não encontrada');
 

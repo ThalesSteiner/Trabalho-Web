@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { Perfis, Publico, UsuarioAtual, type UsuarioToken } from '../auth/auth.decorators';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
@@ -28,5 +28,12 @@ export class PagamentoController {
   @Post()
   criar(@UsuarioAtual() usuario: UsuarioToken, @Body() dto: CriarPagamentoDto) {
     return this.pagamentoService.criar(usuario.sub, dto);
+  }
+
+  @Perfis('ADMIN')
+  @Post(':id/estornar')
+  @HttpCode(200)
+  estornar(@Param('id', ParseUUIDPipe) id: string) {
+    return this.pagamentoService.estornar(id);
   }
 }

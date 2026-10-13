@@ -102,6 +102,10 @@ export class PagamentoRepository {
     );
   }
 
+  async removerVenda(pedidoId: string, trx: Knex) {
+    await trx('fat_venda').where({ pedidoId }).delete();
+  }
+
   private comNota(consulta: Knex.QueryBuilder) {
     return consulta
       .leftJoin('dim_nota_fiscal as n', 'n.id', 'p.notaFiscalId')

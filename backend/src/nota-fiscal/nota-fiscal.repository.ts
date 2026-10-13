@@ -57,6 +57,10 @@ export class NotaFiscalRepository {
     return rows[0].numero;
   }
 
+  async cancelar(id: number, trx: Knex) {
+    await trx('dim_nota_fiscal').where({ id }).update({ cancelada: true });
+  }
+
   async salvar(nota: Pick<NotaFiscal, 'numero' | 'chaveAcesso' | 'emitidaEm'>, trx: Knex): Promise<NotaFiscal> {
     const [nova] = await trx('dim_nota_fiscal').insert(nota).returning('*');
     return nova;

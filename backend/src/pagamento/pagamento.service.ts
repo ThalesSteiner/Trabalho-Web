@@ -65,6 +65,19 @@ export class PagamentoService {
     return this.repository.buscarPorId(pagamento.id);
   }
 
+  async estornar(id: string) {
+    const pagamento = await this.repository.buscarPorId(id);
+    if (!pagamento) throw new NotFoundException('Pagamento não encontrado');
+    if (pagamento.status !== 'APROVADO') throw new BadRequestException('Só pagamento aprovado pode ser estornado');
+
+    await this.repository.transacao(async (trx) => {
+      await this.repository.removerVenda(id, trx);
+      await this.notaFiscalService.cancelar(pagamento.notaFiscalId, trx);
+      await this.repository.atualizar(id, { status: 'ESTORNADO' }, trx);
+    });
+    return this.repository.buscarPorId(id);
+  }
+
   private async calcularItem(lojaId: number, itemId: number, quantidade: number): Promise<ItemPago> {
     const preco = await this.repository.precoVigente(itemId, lojaId);
     if (!preco) throw new BadRequestException(`Item ${itemId} sem preço nesta loja`);
