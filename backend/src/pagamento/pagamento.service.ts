@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
+import { GatewayService } from './gateway.service';
 import { PagamentoRepository, Promocao } from './pagamento.repository';
 import { ItemPago } from './pagamento.types';
 
@@ -7,7 +8,10 @@ const centavos = (valor: number) => Math.round(valor * 100) / 100;
 
 @Injectable()
 export class PagamentoService {
-  constructor(private readonly repository: PagamentoRepository) {}
+  constructor(
+    private readonly repository: PagamentoRepository,
+    private readonly gateway: GatewayService,
+  ) {}
 
   formas() {
     return this.repository.formas();
@@ -21,8 +25,17 @@ export class PagamentoService {
 
     const itensPagos = await Promise.all(itens.map((item) => this.calcularItem(lojaId, item.itemId, item.quantidade)));
     const valor = centavos(itensPagos.reduce((soma, item) => soma + item.valorPago, 0));
+    const pagamento = await this.repository.criar({ usuarioId, lojaId, formaPagamentoId, itens: itensPagos, valor });
 
-    return this.repository.criar({ usuarioId, lojaId, formaPagamentoId, itens: itensPagos, valor });
+    const resposta = await this.gateway.cobrar(forma.nome, valor);
+    const processadoEm = new Date();
+    if (!resposta.aprovado) {
+      await this.repository.atualizar(pagamento.id, { status: 'RECUSADO', motivo: resposta.motivo, processadoEm });
+      return this.repository.buscarPorId(pagamento.id);
+    }
+
+    await this.repository.atualizar(pagamento.id, { status: 'APROVADO', codigoTransacao: resposta.codigo, processadoEm });
+    return this.repository.buscarPorId(pagamento.id);
   }
 
   private async calcularItem(lojaId: number, itemId: number, quantidade: number): Promise<ItemPago> {
