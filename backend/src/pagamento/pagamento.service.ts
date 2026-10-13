@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import type { UsuarioToken } from '../auth/auth.decorators';
 import { NotaFiscalService } from '../nota-fiscal/nota-fiscal.service';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
+import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { GatewayService } from './gateway.service';
 import { PagamentoRepository, Promocao } from './pagamento.repository';
 import { ItemPago } from './pagamento.types';
@@ -17,6 +19,20 @@ export class PagamentoService {
 
   formas() {
     return this.repository.formas();
+  }
+
+  async listar(usuario: UsuarioToken, filtros: ListarPagamentosDto) {
+    const usuarioId = usuario.perfil === 'CLIENTE' ? usuario.sub : undefined;
+    const { data, total } = await this.repository.listar(filtros, usuarioId);
+    return { data, total, page: filtros.page, limit: filtros.limit };
+  }
+
+  async buscar(usuario: UsuarioToken, id: string) {
+    const pagamento = await this.repository.buscarPorId(id);
+    if (!pagamento || (usuario.perfil === 'CLIENTE' && pagamento.usuarioId !== usuario.sub)) {
+      throw new NotFoundException('Pagamento não encontrado');
+    }
+    return pagamento;
   }
 
   async criar(usuarioId: string, { lojaId, formaPagamentoId, itens }: CriarPagamentoDto) {

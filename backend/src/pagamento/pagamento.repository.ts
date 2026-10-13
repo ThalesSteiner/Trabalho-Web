@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../database/knex.module';
+import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { NovoPagamento, Pagamento } from './pagamento.types';
 
 export type Promocao = { id: number; tipo: string; valor: number | null; leve: number | null; pague: number | null };
@@ -25,7 +26,24 @@ export class PagamentoRepository {
   }
 
   buscarPorId(id: string, trx: Knex = this.knex) {
-    return this.comNota(trx).where('p.id', id).first();
+    return this.comNota(trx('pagamento as p')).where('p.id', id).first();
+  }
+
+  async listar({ page, limit, status, lojaId, formaPagamentoId, de, ate }: ListarPagamentosDto, usuarioId?: string) {
+    const filtro = this.knex('pagamento as p');
+    if (usuarioId) filtro.where('p.usuarioId', usuarioId);
+    if (status) filtro.where('p.status', status);
+    if (lojaId) filtro.where('p.lojaId', lojaId);
+    if (formaPagamentoId) filtro.where('p.formaPagamentoId', formaPagamentoId);
+    if (de) filtro.where('p.criadoEm', '>=', de);
+    if (ate) filtro.where('p.criadoEm', '<=', ate);
+
+    const [{ total }] = await filtro.clone().count({ total: '*' });
+    const data = await this.comNota(filtro)
+      .orderBy('p.criadoEm', 'desc')
+      .offset((page - 1) * limit)
+      .limit(limit);
+    return { data, total: Number(total) };
   }
 
   formas(): Promise<{ id: number; nome: string }[]> {
@@ -84,8 +102,8 @@ export class PagamentoRepository {
     );
   }
 
-  private comNota(trx: Knex) {
-    return trx('pagamento as p')
+  private comNota(consulta: Knex.QueryBuilder) {
+    return consulta
       .leftJoin('dim_nota_fiscal as n', 'n.id', 'p.notaFiscalId')
       .select('p.*', 'n.uuid as notaUuid', 'n.numero as notaNumero', 'n.chaveAcesso as notaChave');
   }

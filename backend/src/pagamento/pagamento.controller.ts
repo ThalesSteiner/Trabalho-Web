@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { Perfis, Publico, UsuarioAtual, type UsuarioToken } from '../auth/auth.decorators';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
+import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { PagamentoService } from './pagamento.service';
 
 @Controller('pagamentos')
@@ -11,6 +12,16 @@ export class PagamentoController {
   @Get('formas')
   formas() {
     return this.pagamentoService.formas();
+  }
+
+  @Get()
+  listar(@UsuarioAtual() usuario: UsuarioToken, @Query() filtros: ListarPagamentosDto) {
+    return this.pagamentoService.listar(usuario, filtros);
+  }
+
+  @Get(':id')
+  buscar(@UsuarioAtual() usuario: UsuarioToken, @Param('id', ParseUUIDPipe) id: string) {
+    return this.pagamentoService.buscar(usuario, id);
   }
 
   @Perfis('CLIENTE')
