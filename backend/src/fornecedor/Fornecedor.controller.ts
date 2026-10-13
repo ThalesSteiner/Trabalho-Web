@@ -1,13 +1,33 @@
-import { nomefuncaodoservicefornecedor } from 'caminhodoservicefornecedor'
+import {Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { FornecedorService } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.service.ts';
+import * as FornecedorEntidade from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
 
-export function GetFornecedorPeloId(req: Request, res: Response){
-  try{
-  const id: Number = Number(req.params.id);
-  const fornecedor = nomefuncaodoservicefornecedor(id);
-  if(!fornecedor){ throw { status: 404, message: "Fornecedor não encontrado!" }}
-  return res.status(200).json(fornecedor);
-    
-    } catch(e){
-        return res.status(e.status).json({erro: e.message});  
-      }
+@Controller('fornecedores')
+export class FornecedorController {
+  constructor(private service: FornecedorService) {}
+
+  @Get()
+  listar() { return this.service.listar(); }
+
+  @Get(':id')
+  buscarPorId(@Param('id') id: string) { return this.service.buscarPorId(id);}
+
+  @Post()
+  criar(@Body() caminho: CriarFornecedorDto) {return this.service.criar(caminho);}
+
+  @Put(':id')
+  atualizar(@Param('id') id: string, @Body() caminho: AtualizarFornecedorDto) {
+    return this.service.atualizar(id, caminho);
+  }
+
+  @Patch(':id')
+  atualizarParcial(@Param('id') id: string,@Body() caminho: AtualizarParcialFornecedorDto) {
+    return this.service.atualizarParcial(id, caminho);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  excluir(@Param('id') id: string) {
+    return this.service.excluir(id);
+  }
 }
