@@ -9,6 +9,10 @@ export type Promocao = { id: number; tipo: string; valor: number | null; leve: n
 export class PagamentoRepository {
   constructor(@Inject(KNEX) private readonly knex: Knex) {}
 
+  transacao<T>(executar: (trx: Knex.Transaction) => Promise<T>) {
+    return this.knex.transaction(executar);
+  }
+
   async criar(pagamento: NovoPagamento): Promise<Pagamento> {
     const [novo] = await this.knex('pagamento')
       .insert({ ...pagamento, itens: JSON.stringify(pagamento.itens) })
@@ -51,6 +55,33 @@ export class PagamentoRepository {
       .where({ itemId })
       .whereNot('tipoPromocaoId', 'NENHUMA')
       .first('id', 'tipoPromocaoId as tipo', 'valor', 'qtdLeve as leve', 'qtdPague as pague');
+  }
+
+  async clienteDoUsuario(usuarioId: string, trx: Knex): Promise<number> {
+    const cliente = await trx('dim_cliente').where({ usuarioId }).first('id');
+    if (cliente) return cliente.id;
+
+    const usuario = await trx('usuario').where({ id: usuarioId }).first('nome');
+    const [novo] = await trx('dim_cliente').insert({ usuarioId, nome: usuario.nome }).returning('id');
+    return novo.id;
+  }
+
+  async registrarVenda(pagamento: Pagamento, clienteId: number, notaFiscalId: number, trx: Knex) {
+    await trx('fat_venda').insert(
+      pagamento.itens.map((item) => ({
+        dataHoraVenda: pagamento.processadoEm,
+        lojaId: pagamento.lojaId,
+        itemId: item.itemId,
+        clienteId,
+        precoId: item.precoId,
+        promocaoId: item.promocaoId,
+        formaPagamentoId: pagamento.formaPagamentoId,
+        notaFiscalId,
+        pedidoId: pagamento.id,
+        quantidade: item.quantidade,
+        valorPago: item.valorPago,
+      })),
+    );
   }
 
   private comNota(trx: Knex) {

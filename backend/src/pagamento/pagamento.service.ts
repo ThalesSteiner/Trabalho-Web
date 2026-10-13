@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { NotaFiscalService } from '../nota-fiscal/nota-fiscal.service';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
 import { GatewayService } from './gateway.service';
 import { PagamentoRepository, Promocao } from './pagamento.repository';
@@ -11,6 +12,7 @@ export class PagamentoService {
   constructor(
     private readonly repository: PagamentoRepository,
     private readonly gateway: GatewayService,
+    private readonly notaFiscalService: NotaFiscalService,
   ) {}
 
   formas() {
@@ -34,7 +36,16 @@ export class PagamentoService {
       return this.repository.buscarPorId(pagamento.id);
     }
 
-    await this.repository.atualizar(pagamento.id, { status: 'APROVADO', codigoTransacao: resposta.codigo, processadoEm });
+    await this.repository.transacao(async (trx) => {
+      const nota = await this.notaFiscalService.emitir(trx);
+      const clienteId = await this.repository.clienteDoUsuario(usuarioId, trx);
+      await this.repository.registrarVenda({ ...pagamento, processadoEm }, clienteId, nota.id, trx);
+      await this.repository.atualizar(
+        pagamento.id,
+        { status: 'APROVADO', codigoTransacao: resposta.codigo, notaFiscalId: nota.id, processadoEm },
+        trx,
+      );
+    });
     return this.repository.buscarPorId(pagamento.id);
   }
 
