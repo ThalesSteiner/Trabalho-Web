@@ -47,7 +47,7 @@ export class FornecedorRepository {
       .returning('*');
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado" }
+      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
     }
     return fornecedor;
   }
@@ -59,7 +59,7 @@ export class FornecedorRepository {
       .returning('*');
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado" }
+      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
     }
     return fornecedor;
   }
@@ -70,7 +70,7 @@ export class FornecedorRepository {
       .delete();
 
     if (quantidade === 0) {
-      throw { status: 404, message: "Fornecedor não encontrado" }
+      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
     }
   }
 }
