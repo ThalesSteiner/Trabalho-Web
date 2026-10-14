@@ -1,28 +1,67 @@
 import { Injectable } from '@nestjs/common';
+import { Knex } from 'knex';
+import { db } from 'database'
+import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
 
 @Injectable()
 export class FornecedorRepository {
-  async listar(): Promise<string> {
-    return 'OK';
+  private readonly tabela = 'fornecedores';
+
+  async listar(): Promise<Fornecedor[]> {
+    return db<Fornecedor>(this.tabela).select('*');
   }
 
-  async buscarPorId(id: number): Promise<string> {
-    return 'OK';
+  async buscarPorId(id: number): Promise<Fornecedor> {
+    const fornecedor = await db<Fornecedor>(this.tabela)
+      .where({ id })
+      .first();
+
+    if (!fornecedor) {
+      throw new NotFoundException(
+        `Fornecedor com ID ${id} não encontrado.`,
+      );
+    }
+    return fornecedor;
   }
 
-  async criar(): Promise<string> {
-    return 'OK';
+  async criar(dados: FornecedorSemId): Promise<Fornecedor> {
+    const [fornecedor] = await db<Fornecedor>(this.tabela)
+      .insert(dados)
+      .returning('*');
+    return fornecedor;
   }
 
-  async atualizar(): Promise<string> {
-    return 'OK';
+  async atualizar(id: number, dados: FornecedorSemId): Promise<Fornecedor> {
+    const [fornecedor] = await db<Fornecedor>(this.tabela)
+      .where({ id })
+      .update(dados)
+      .returning('*');
+
+    if (!fornecedor) {
+      throw { status: 404, message: "Fornecedor não encontrado" }
+    }
+    return fornecedor;
   }
 
-  async atualizarParcial(): Promise<string> {
-    return 'OK';
+  async atualizarParcial(id: number, dados: AtualizarParcialFornecedor): Promise<Fornecedor> {
+    const [fornecedor] = await db<Fornecedor>(this.tabela)
+      .where({ id })
+      .update(dados)
+      .returning('*');
+
+    if (!fornecedor) {
+      throw { status: 404, message: "Fornecedor não encontrado" }
+    }
+    return fornecedor;
   }
 
-  async excluir(): Promise<string> {
-    return 'OK';
+  async excluir(id: number): Promise<void> {
+    const quantidade = await db<Fornecedor>(this.tabela)
+      .where({ id })
+      .delete();
+
+    if (quantidade === 0) {
+      throw { status: 404, message: "Fornecedor não encontrado" }
+    }
   }
 }
