@@ -12,6 +12,9 @@ export class FornecedorController {
   @Get(':id')
   buscarPorId(@Param('id') id: string) { return this.service.buscarPorId(id);}
 
+  @Get(':cnpj')
+  buscarPorCnpj(@Param('cnpj') cnpj: string) { return this.service.buscarPorCnpj(cnpj);}
+
   @Post()
   criar(@Body() dados: FornecedorEntidade.FornecedorSemId) {return this.service.criar(dados);}
 
