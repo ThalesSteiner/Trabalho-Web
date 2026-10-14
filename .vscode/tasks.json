@@ -9,6 +9,16 @@
         "cwd": "${workspaceFolder}/backend"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "supabase: db reset",
+      "type": "shell",
+      "command": "npx supabase db reset",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "dependsOn": ["supabase: start"],
+      "problemMatcher": []
     }
   ]
 }
