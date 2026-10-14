@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
-import { fornecedor } from 'Trabalho-Web/tree/main/backend/src/database/dados-mock.ts'
+import { db } from 'Trabalho-Web/tree/main/backend/src/database/dados-mock.ts'
 import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
 
 @Injectable()
@@ -73,4 +73,21 @@ export class FornecedorRepository {
       throw { status: 404, message: "Fornecedor não encontrado com esse id" }
     }
   }
+
+    async buscarCategoriasExistentes(id: number, categoriasBuscadas: string[]): Promise<string[]> { //retorna as categorias que existem em tal id
+  const fornecedor = await db<Fornecedor>(this.tabela)
+    .where({ id })
+    .first();
+  if (!fornecedor) {
+    return [];
+  }
+  const categoriasFornecedor = fornecedor.categorias;
+  return categoriasBuscadas.filter(categoria =>
+    categoriasFornecedor.some(
+      existente =>
+        existente.toLowerCase() === categoria.toLowerCase(),
+    )
+  );
+}
+  
 }
