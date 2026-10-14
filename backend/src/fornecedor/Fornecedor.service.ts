@@ -21,32 +21,40 @@ export class FornecedorService {
   }
 
   async criar(dados: FornecedorSemId): Promise<Fornecedor> {
-    this.validarCampos(dados, ['cnpj', 'razaoSocial']);
+    this.validarCampos(dados, ['cnpj', 'razaoSocial', 'categorias']);
     this.validarCnpj(dados.cnpj);
     this.validarRazaoSocial(dados.razaoSocial);
+    this.validarCategorias(dados.razaoSocial);
     const fornecedor: FornecedorSemId = {
       cnpj: dados.cnpj,
       razaoSocial: dados.razaoSocial.trim(),
+      categorias: dados.categorias.map(
+        categoria => categoria.trim()
+      )
     };
     return this.repository.criar(fornecedor);
   }
 
-  async atualizar(idRecebido: string,dados: FornecedorSemId ): Promise<Fornecedor>{
+  async atualizar(idRecebido: string, dados: FornecedorSemId ): Promise<Fornecedor>{
     const id = this.validarId(idRecebido);
-    this.validarCampos(dados, ['cnpj', 'razaoSocial']);
+    this.validarCampos(dados, ['cnpj', 'razaoSocial', 'categorias']);
     this.validarCnpj(dados.cnpj);
     this.validarRazaoSocial(dados.razaoSocial);
+    this.validarCategorias(dados.razaoSocial);
     const fornecedor: FornecedorSemId = {
       cnpj: dados.cnpj,
       razaoSocial: dados.razaoSocial.trim(),
+      categorias: dados.categorias.map(
+        categoria => categoria.trim()
+      )
     };
     return this.repository.atualizar(id, fornecedor);
   }
 
   async atualizarParcial(idRecebido: string,bdados: AtualizarParcialFornecedor): Promise<Fornecedor> {
     const id = this.validarId(idRecebido);
-    this.validarCampos(dados, ['cnpj', 'razaoSocial']);
-    if (dados.cnpj === undefined && dados.razaoSocial === undefined) {
+    this.validarCampos(dados, ['cnpj', 'razaoSocial', 'categorias']);
+    if (dados.cnpj === undefined && dados.razaoSocial === undefined && dados.categoria === undefined) {
       throw { status: 500 , message: "Informe no mínimo um campo para ser atualizado" }
     }
 
@@ -58,6 +66,13 @@ export class FornecedorService {
       this.validarRazaoSocial(dados.razaoSocial);
     }
 
+    if (dados.categorias !== undefined) {
+      this.validarCategorias(dados.categorias);
+      atualizacao.categorias = dados.categorias.map(
+        categoria => categoria.trim()
+      );
+    }
+    
     const atualizacao: AtualizarParcialFornecedor = {};
 
     if (dados.cnpj !== undefined) {
@@ -68,6 +83,13 @@ export class FornecedorService {
       atualizacao.razaoSocial = dados.razaoSocial.trim();
     }
 
+    if (dados.categorias !== undefined) {
+      this.validarCategorias(dados.categorias);
+      atualizacao.categorias = dados.categorias.map(
+        categoria => categoria.trim()
+      );
+    }
+    
     return this.repository.atualizarParcial(id, atualizacao);
   }
 
@@ -100,6 +122,12 @@ export class FornecedorService {
     }
   }
 
+  private validarCategorias(categorias: unknown): void {
+    if ( !Array.isArray(categorias) || categorias.length === 0 || !categorias.every( categoria => typeof categoria === 'string' && categoria.trim().length > 0)){
+      throw { status: 500 , message: "Categoria não descrita adequadamente" }
+    }
+  }
+  
   private validarCampos( dados: unknown, camposPermitidos: string[]): void {
     if (dados === null || typeof dados !== 'object' || Array.isArray(dados)
     ) {
