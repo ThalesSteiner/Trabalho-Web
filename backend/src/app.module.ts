@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { CustoModule } from './custo/custo.module';
 import { databaseConfig } from './database/database.config';
 import { KnexModule } from './database/knex.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
@@ -22,6 +23,7 @@ import { TracingMiddleware } from './tracing/tracing.middleware';
     KnexModule,
     AuthModule,
     PagamentoModule,
+    CustoModule,
     TestModule,
   ],
 })
