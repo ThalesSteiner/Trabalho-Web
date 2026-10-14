@@ -47,11 +47,11 @@ export const funcionarios = lojas.flatMap((_, loja) => [
 export const clientes = nomes.slice(lojas.length * 2);
 
 export const fornecedores = [
-  { razaoSocial: 'Distribuidora Bebidas Sul Ltda', categorias: ['Bebidas'] },
-  { razaoSocial: 'Laticínios Serra Azul S.A.', categorias: ['Laticínios', 'Congelados'] },
-  { razaoSocial: 'Atacadão Mercearia Paulista Ltda', categorias: ['Mercearia', 'Limpeza', 'Higiene'] },
-  { razaoSocial: 'Padaria Pão Dourado Ltda', categorias: ['Padaria'] },
-  { razaoSocial: 'Hortifruti Campo Verde Ltda', categorias: ['Hortifruti'] },
+  { razaoSocial: 'Distribuidora Bebidas Sul Ltda', categorias: ['Bebidas'], cnpj: 12345678901234 },
+  { razaoSocial: 'Laticínios Serra Azul S.A.', categorias: ['Laticínios', 'Congelados'], cnpj: 22345678901234  },
+  { razaoSocial: 'Atacadão Mercearia Paulista Ltda', categorias: ['Mercearia', 'Limpeza', 'Higiene'], cnpj: 32345678901234  },
+  { razaoSocial: 'Padaria Pão Dourado Ltda', categorias: ['Padaria'], cnpj: 42345678901234  },
+  { razaoSocial: 'Hortifruti Campo Verde Ltda', categorias: ['Hortifruti'], cnpj: 52345678901234  },
 ];
 
 export const validadePorCategoria: Record<string, number> = {
