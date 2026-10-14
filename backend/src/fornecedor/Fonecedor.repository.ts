@@ -8,7 +8,7 @@ export class FornecedorRepository {
   private readonly tabela = 'fornecedores';
 
   async listar(): Promise<Fornecedor[]> {
-    return db<Fornecedor>(this.tabela).select('*');
+    return await db<Fornecedor>(this.tabela).select('*');
   }
 
   async buscarPorId(id: number): Promise<Fornecedor> {
@@ -17,9 +17,7 @@ export class FornecedorRepository {
       .first();
 
     if (!fornecedor) {
-      throw new NotFoundException(
-        `Fornecedor com ID ${id} não encontrado.`,
-      );
+      throw { status: 404, message: "Fornecedor não encontrado" }
     }
     return fornecedor;
   }
