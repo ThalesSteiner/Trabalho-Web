@@ -1,121 +1,112 @@
+  
 import { Injectable } from '@nestjs/common';
 import { FornecedorRepository } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.repository.ts';
 import { Fornecedor , FornecedorSemId, AtualizarParcialFornecedor} from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
 
 @Injectable()
 export class FornecedorService {
-  private fornecedores: Fornecedor[] = []; 
-  private proximoId = 1; //util para um id maneiro e disponivel
-  constructor(private repository: FornecedorRepository ) {}
+  constructor(private readonly repository: FornecedorRepository,) {}
 
-  async listar(): Promise<Fornecedor[]> {
-    await this.repository.listar();
-    return this.fornecedores;
+  async listar(): Promise<Fornecedor[]>{
+    return this.repository.listar();
   }
 
   async buscarPorId(idRecebido: string): Promise<Fornecedor> {
     const id = this.validarId(idRecebido);
-    await this.repository.buscarPorId(id);
-    const fornecedor = this.fornecedores.find((f) => f.id === id);
-    if (!fornecedor) {
-      throw { status: 404 , message: "fornecedor não encontrado ou não existe" } }
-    return fornecedor;
+    return this.repository.buscarPorId(id);
   }
-  
+
   async criar(dados: FornecedorSemId): Promise<Fornecedor> {
     this.validarCampos(dados, ['cnpj', 'razaoSocial']);
     this.validarCnpj(dados.cnpj);
     this.validarRazaoSocial(dados.razaoSocial);
-    const fornecedor: Fornecedor = {
-      id: this.proximoId++,
+    const fornecedor: FornecedorSemId = {
       cnpj: dados.cnpj,
       razaoSocial: dados.razaoSocial.trim(),
     };
-    await this.repository.criar();
-    this.fornecedores.push(fornecedor);
-    return fornecedor;
+    return this.repository.criar(fornecedor);
   }
 
-  async atualizar(idRecebido: string, dados: FornecedorSemId): Promise<Fornecedor> {
+  async atualizar(idRecebido: string,dados: FornecedorSemId ): Promise<Fornecedor>{
     const id = this.validarId(idRecebido);
     this.validarCampos(dados, ['cnpj', 'razaoSocial']);
     this.validarCnpj(dados.cnpj);
     this.validarRazaoSocial(dados.razaoSocial);
-    const fornecedor = await this.buscarPorId(String(id));
-    await this.repository.atualizar();
-    fornecedor.cnpj = dados.cnpj;
-    fornecedor.razaoSocial = dados.razaoSocial.trim();
-    return fornecedor;
+    const fornecedor: FornecedorSemId = {
+      cnpj: dados.cnpj,
+      razaoSocial: dados.razaoSocial.trim(),
+    };
+    return this.repository.atualizar(id, fornecedor);
   }
 
-  async atualizarParcial(idRecebido: string, dados: AtualizarParcialFornecedor): Promise<Fornecedor> {
+  async atualizarParcial(idRecebido: string,bdados: AtualizarParcialFornecedor): Promise<Fornecedor> {
     const id = this.validarId(idRecebido);
     this.validarCampos(dados, ['cnpj', 'razaoSocial']);
     if (dados.cnpj === undefined && dados.razaoSocial === undefined) {
       throw { status: 500 , message: "Informe no mínimo um campo para ser atualizado" }
     }
+
     if (dados.cnpj !== undefined) {
       this.validarCnpj(dados.cnpj);
     }
+
     if (dados.razaoSocial !== undefined) {
       this.validarRazaoSocial(dados.razaoSocial);
     }
 
-    const fornecedor = await this.buscarPorId(String(id));
-    await this.repository.atualizarParcial();
+    const atualizacao: AtualizarParcialFornecedor = {};
+
     if (dados.cnpj !== undefined) {
-      fornecedor.cnpj = dados.cnpj;
+      atualizacao.cnpj = dados.cnpj;
     }
+
     if (dados.razaoSocial !== undefined) {
-      fornecedor.razaoSocial = dados.razaoSocial.trim();
+      atualizacao.razaoSocial = dados.razaoSocial.trim();
     }
-    return fornecedor;
+
+    return this.repository.atualizarParcial(id, atualizacao);
   }
 
-  async excluir(idRecebido: string,): Promise<{ mensagem: string }> {
+  async excluir(idRecebido: string): Promise<{ mensagem: string }> {
     const id = this.validarId(idRecebido);
-    await this.buscarPorId(String(id));
-    await this.repository.excluir();
-    this.fornecedores = this.fornecedores.filter(
-      (f) => f.id !== id
-    );
-    return {status: 204, mensagem: "Fornecedor excluido"};
+    await this.repository.excluir(id);
+    return { mensagem: 'Fornecedor excluído com sucesso.'};
   }
 
-  private validarId(idRecebido: string): number { //validar os ids e outras coisas das regras de negócios
-    if (typeof idRecebido !== 'string' || idRecebido === undefined || idRecebido.trim() === "") {
+  private validarId(idRecebido: string): number {
+    if (typeof idRecebido !== 'string' ||idRecebido.trim() === '') {
       throw { status: 500 , message: "Informe um Id válido" }
     }
-
     const id = Number(idRecebido);
-    if (!Number.isSafeInteger(id)){
+    if (!Number.isSafeInteger(id) || id <= 0) {
       throw { status: 500 , message: "Informe um Id válido" }
     }
     return id;
   }
 
   private validarCnpj(cnpj: unknown): void {
-    if( typeof cnpj !== 'string' || !/^\d{14}$/.test(cnpj)){ // ve se tem o tamanho certo de um cnpj, 14 numeros
+    if (typeof cnpj !== 'string' ||!/^\d{14}$/.test(cnpj)) {//ve se tem 14 numeros mesmo
       throw { status: 500 , message: "CNPJ inválido, verifique se tem 14 números" }
     }
   }
 
   private validarRazaoSocial(razaoSocial: unknown): void {
-    if( typeof razaoSocial !== 'string' || razaoSocial.trim().length === 0){
+    if (typeof razaoSocial !== 'string' ||razaoSocial.trim().length === 0) {
       throw { status: 500 , message: "A razão social é obrigatória e não pode estar vazia" }
     }
   }
 
-  private validarCampos(dados: unknown,camposPermitidos: string[]): void {
-    if(dados === null || typeof dados !== 'object' || Array.isArray(dados)){
-       throw { status: 500 , message: "Os dados devem estar em um json válido" }
+  private validarCampos( dados: unknown, camposPermitidos: string[]): void {
+    if (dados === null || typeof dados !== 'object' || Array.isArray(dados)
+    ) {
+      throw { status: 500 , message: "Os dados devem estar em um json válido" }
     }
-
     const camposRecebidos = Object.keys(dados);
-    const camposInvalidos = camposRecebidos.filter((campo) => !camposPermitidos.includes(campo));
-    if(camposInvalidos.length > 0){
-       throw { status: 500 , message: "Erro nos campos, inválido!" }
+    const camposInvalidos = camposRecebidos.filter(
+      (campo) => !camposPermitidos.includes(campo),
+    );
+    if (camposInvalidos.length > 0) {
+      throw { status: 500 , message: "Erro nos campos, inválido!" }
     }
   }
 }
-
