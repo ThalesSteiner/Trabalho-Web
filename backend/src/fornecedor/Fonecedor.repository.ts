@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
-import { db } from 'database'
+import { db } from 'Trabalho-Web/tree/main/backend/src/database/dados-mock.ts'
 import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
 
 @Injectable()
