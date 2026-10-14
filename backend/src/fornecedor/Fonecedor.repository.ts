@@ -17,7 +17,18 @@ export class FornecedorRepository {
       .first();
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado" }
+      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
+    }
+    return fornecedor;
+  }
+
+  async buscarPorCnpj(cnpj: string): Promise<Fornecedor> {
+    const fornecedor = await db<Fornecedor>(this.tabela)
+      .where({ cnpj })
+      .first();
+
+    if (!fornecedor) {
+      throw { status: 404, message: "Fornecedor não encontrado com esse cnpj" }
     }
     return fornecedor;
   }
