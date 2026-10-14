@@ -4,7 +4,7 @@ import { Fornecedor , FornecedorSemId, AtualizarParcialFornecedor} from 'Trabalh
 
 @Injectable()
 export class FornecedorService {
-  constructor(private readonly repository: FornecedorRepository,) {}
+  constructor(private readonly repository: FornecedorRepository) {}
 
   async listar(): Promise<Fornecedor[]>{
     return this.repository.listar();
@@ -13,6 +13,11 @@ export class FornecedorService {
   async buscarPorId(idRecebido: string): Promise<Fornecedor> {
     const id = this.validarId(idRecebido);
     return this.repository.buscarPorId(id);
+  }
+
+  async buscarPorCnpj(cnpjrecebido: string): Promise<Fornecedor> {
+    const cnpj = this.validarCnpj(cnpjrecebido);
+    return this.repository.buscarPorCnpj(cnpj);
   }
 
   async criar(dados: FornecedorSemId): Promise<Fornecedor> {
