@@ -1,4 +1,3 @@
-  
 import { Injectable } from '@nestjs/common';
 import { FornecedorRepository } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.repository.ts';
 import { Fornecedor , FornecedorSemId, AtualizarParcialFornecedor} from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
