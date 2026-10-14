@@ -99,6 +99,19 @@ export class FornecedorService {
     return { mensagem: 'Fornecedor excluído com sucesso.'};
   }
 
+    async buscarCategoriasExistentes( idRecebido: string, categoriasRecebidas: string[]): Promise<string[]>{
+    const id = this.validarId(idRecebido);
+    if (!Array.isArray(categoriasRecebidas) || categoriasRecebidas.length === 0 || !categoriasRecebidas.every(categoria =>typeof categoria === 'string' &&categoria.trim().length > 0)
+    ) {
+      throw { status: 500, message: "Informe uma categoria válida" }
+    }
+    const categorias = categoriasRecebidas.map(
+      categoria => categoria.trim()
+    );
+    return this.repository.buscarCategoriasExistentes(id,categorias);
+}
+  
+
   private validarId(idRecebido: string): number {
     if (typeof idRecebido !== 'string' ||idRecebido.trim() === '') {
       throw { status: 500 , message: "Informe um Id válido" }
