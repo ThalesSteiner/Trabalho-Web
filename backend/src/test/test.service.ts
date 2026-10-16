@@ -61,7 +61,7 @@ export class TestService {
       status: dto.status ?? TestStatus.ATIVO,
       criadoEm: new Date(),
     };
-    this.items.push(item);
+      this.items.push(item);
 
     trace.getActiveSpan()?.addEvent('test.criado', { 'test.id': item.id });
 

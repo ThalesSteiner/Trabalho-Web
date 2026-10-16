@@ -9,7 +9,7 @@ export async function up(knex: Knex) {
     )
   `);
 
-  await knex.raw(`alter table dim_item enable row level security`);
+   await knex.raw(`alter table dim_item enable row level security`);
 }
 
 export async function down(knex: Knex) {

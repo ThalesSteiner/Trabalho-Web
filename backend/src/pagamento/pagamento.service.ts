@@ -46,7 +46,7 @@ export class PagamentoService {
     const pagamento = await this.repository.criar({ usuarioId, lojaId, formaPagamentoId, itens: itensPagos, valor });
 
     const resposta = await this.gateway.cobrar(forma.nome, valor);
-    const processadoEm = new Date();
+     const processadoEm = new Date();
     if (!resposta.aprovado) {
       await this.repository.atualizar(pagamento.id, { status: 'RECUSADO', motivo: resposta.motivo, processadoEm });
       return this.repository.buscarPorId(pagamento.id);
