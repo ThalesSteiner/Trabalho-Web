@@ -1,6 +1,7 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { trace } from '@opentelemetry/api';
-import { DataSource } from 'typeorm';
+import type { Knex } from 'knex';
+import { KNEX } from '../database/knex.module';
 import { Trace } from '../tracing/trace.decorator';
 import { CreateTestDto } from './dto/create-test.dto';
 import { ListTestDto } from './dto/list-test.dto';
@@ -12,14 +13,14 @@ export class TestService {
   private readonly items: TestEntity[] = [];
   private nextId = 1;
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(@Inject(KNEX) private readonly knex: Knex) {}
 
   @Trace()
   async database() {
-    const [result] = await this.dataSource.query(
+    const { rows } = await this.knex.raw(
       'select version() as versao, current_database() as banco, now() as horario',
     );
-    return { conectado: true, ...result };
+    return { conectado: true, ...rows[0] };
   }
 
   @Trace()
