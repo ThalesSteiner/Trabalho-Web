@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { FornecedorService } from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.service.ts';
-import * as FornecedorEntidade from 'Trabalho-Web/tree/main/backend/src/fornecedor/Fornecedor.entity.ts';
+import { FornecedorService } from 'main/backend/src/fornecedor/Fornecedor.service.ts';
+import * as FornecedorEntidade from 'main/backend/src/fornecedor/Fornecedor.entity.ts';
 
 @Controller('fornecedores')
 export class FornecedorController {
