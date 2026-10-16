@@ -19,6 +19,7 @@ export class NotaFiscalController {
     return this.notaFiscalService.buscarPorChave(chave);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get(':uuid')
   buscar(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.notaFiscalService.buscarPorUuid(uuid);

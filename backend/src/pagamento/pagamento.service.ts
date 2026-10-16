@@ -52,16 +52,21 @@ export class PagamentoService {
       return this.repository.buscarPorId(pagamento.id);
     }
 
-    await this.repository.transacao(async (trx) => {
-      const nota = await this.notaFiscalService.emitir(trx);
-      const clienteId = await this.repository.clienteDoUsuario(usuarioId, trx);
-      await this.repository.registrarVenda({ ...pagamento, processadoEm }, clienteId, nota.id, trx);
-      await this.repository.atualizar(
-        pagamento.id,
-        { status: 'APROVADO', codigoTransacao: resposta.codigo, notaFiscalId: nota.id, processadoEm },
-        trx,
-      );
-    });
+    try {
+      await this.repository.transacao(async (trx) => {
+        const nota = await this.notaFiscalService.emitir(trx);
+        const clienteId = await this.repository.clienteDoUsuario(usuarioId, trx);
+        await this.repository.registrarVenda({ ...pagamento, processadoEm }, clienteId, nota.id, trx);
+        await this.repository.atualizar(
+          pagamento.id,
+          { status: 'APROVADO', codigoTransacao: resposta.codigo, notaFiscalId: nota.id, processadoEm },
+          trx,
+        );
+      });
+    } catch (erro) {
+      await this.repository.atualizar(pagamento.id, { status: 'RECUSADO', motivo: 'Falha ao emitir nota fiscal', processadoEm });
+      throw erro;
+    }
     return this.repository.buscarPorId(pagamento.id);
   }
 

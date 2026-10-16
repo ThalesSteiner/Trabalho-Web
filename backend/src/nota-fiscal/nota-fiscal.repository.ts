@@ -13,7 +13,7 @@ export class NotaFiscalRepository {
     if (numero) filtro.where('n.numero', numero.padStart(9, '0'));
     if (lojaId) {
       filtro.whereExists((q) =>
-        q.select(1).from('fat_venda as v').whereColumn('v.notaFiscalId', 'n.id').where('v.lojaId', lojaId),
+        q.select(1).from('fat_venda as v').where('v.notaFiscalId', this.knex.ref('n.id')).where('v.lojaId', lojaId),
       );
     }
     if (de) filtro.where('n.emitidaEm', '>=', de);

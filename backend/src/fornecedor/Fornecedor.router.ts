@@ -5,5 +5,5 @@ export const FornecedorRoutes = {
   atualizar: { method: 'PUT', path: '/fornecedores/:id'},
   atualizarParcial: { method: 'PATCH', path: '/fornecedores/:id'},
   excluir: { method: 'DELETE', path: '/fornecedores/:id'},
-  buscarporCnpj: { method: 'GET', path: '/fornecedores/:cnpj'
+  buscarporCnpj: { method: 'GET', path: '/fornecedores/:cnpj'}
 };
