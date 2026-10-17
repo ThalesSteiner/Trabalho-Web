@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { Perfis } from '../auth/auth.decorators';
 import { DashboardService } from './dashboard.service';
-import { FiltrosDashboardDto, MaisVendidosDto } from './dto/filtros-dashboard.dto';
+import { FiltrosDashboardDto, ListarDashboardDto } from './dto/filtros-dashboard.dto';
 
 @Perfis('ADMIN')
 @Controller('dashboard')
@@ -13,17 +13,17 @@ export class DashboardController {
   }
 
   @Get('mais-vendidos')
-  maisVendidos(@Query() filtros: MaisVendidosDto) {
+  maisVendidos(@Query() filtros: ListarDashboardDto) {
   return this.service.maisVendidos(filtros);
   }
 
   @Get('vendas-por-loja')
-  vendasPorLoja(@Query() filtros: FiltrosDashboardDto) {
+  vendasPorLoja(@Query() filtros: ListarDashboardDto) {
 return this.service.vendasPorLoja(filtros);
   }
 
   @Get('vendas-por-dia')
-  vendasPorDia(@Query() filtros: FiltrosDashboardDto) {
+  vendasPorDia(@Query() filtros: ListarDashboardDto) {
     return this.service.vendasPorDia(filtros);
   }
 }

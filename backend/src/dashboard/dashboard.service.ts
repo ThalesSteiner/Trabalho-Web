@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DashboardRepository } from './dashboard.repository';
-import { FiltrosDashboardDto, MaisVendidosDto } from './dto/filtros-dashboard.dto';
+import { FiltrosDashboardDto, ListarDashboardDto} from './dto/filtros-dashboard.dto';
 
 @Injectable()
 export class DashboardService {
@@ -14,17 +14,17 @@ export class DashboardService {
       : 0;
     return { ...totais, ticketMedio };
   }
-    async maisVendidos(filtros: MaisVendidosDto) {
+    async maisVendidos(filtros: ListarDashboardDto) {
     await this.validarFiltros(filtros);
-    return this.repository.maisVendidos(filtros, filtros.limit);
+    return this.repository.maisVendidos(filtros);
   }
 
-  async vendasPorLoja(filtros: FiltrosDashboardDto) {
+  async vendasPorLoja(filtros: ListarDashboardDto) {
     await this.validarFiltros(filtros);
     return this.repository.vendasPorLoja(filtros);
   }
 
-  async vendasPorDia(filtros: FiltrosDashboardDto) {
+  async vendasPorDia(filtros: ListarDashboardDto) {
     await this.validarFiltros(filtros);
     return this.repository.vendasPorDia(filtros);
   }
