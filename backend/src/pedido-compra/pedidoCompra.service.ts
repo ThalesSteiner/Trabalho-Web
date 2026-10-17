@@ -1,5 +1,5 @@
 import { PedidoCompraRepository } from './pedido-compra.repository.ts';
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra } from './pedido-compra.entity.ts';
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra } from './pedido-compra.entity.ts';
 import { formasPagamento } from './database.dados-mock.ts'; 
 
 export class PedidoCompraService {
@@ -47,5 +47,27 @@ export class PedidoCompraService {
   async remover(id: number): Promise<void> {
     const removido = await this.repository.remover(id);
     if (!removido) throw { status: 404, message: 'Pedido de compra não encontrado' };
+  }
+
+  async buscarPromocao(id: number): Promise<Promocao> {
+    const pedido = await this.buscarPorId(id);
+    const promocao = await this.repository.buscarPromocaoPorItem(pedido.item);
+    if (!promocao) throw {status: 404, message: 'Item do pedido não possui promoções'};
+    return promocao;
+  }
+
+  async calcularTotal(id: number): Promise<TotalPedidoCompra> {
+    const pedido = await this.buscarPorId(id);
+    const item = await this.repository.buscarItemPorNome(pedido.item);
+    if (!item) throw {status: 404, message: 'Item do pedido não encontrado na tabela de itens'};
+    const totalEmCentavos = Math.round(item.preco * 100) * pedido.quantidade;
+
+    return {
+      pedidoId: pedido.id,
+      item: pedido.item,
+      quantidade: pedido.quantidade,
+      precoUnitario: item.preco,
+      total: totalEmCentavos / 100
+    };
   }
 }
