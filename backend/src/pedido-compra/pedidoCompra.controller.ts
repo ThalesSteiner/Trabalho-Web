@@ -1,21 +1,59 @@
-import { Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { pedidoCompraService } from 'main/backend/src/pedido-compra/pedidoCompra.service.ts';
-import * as pedidoCompraEntidade from 'main/backend/src/pedido-compra/pedidoCompra.entity.ts';
+import { Request, Response } from 'express'; //agora tentando sem usar decorator pra treinar
+import { PedidoCompraService } from './pedido-compra.service.ts';
 
-@Controller('pedido-compras')
-export class pedidoCompraController {
-  constructor(private readonly service: pedidoCompraService) {}
+export class PedidoCompraController {
+  constructor(private readonly service: PedidoCompraService) {}
 
-  @Get()
-  listar() { return this.service.listar(); }
-
-  @Get(':id')
-  buscarPorId(@Param('id') id: string) { return this.service.buscarPorId(id);}
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.OK)
-  excluir(@Param('id') id: string) {
-    return this.service.excluir(id);
+  private lerId(req: Request): number {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw { status: 400, message: 'id inválido' };
+    }
+    return id;
   }
-  
+
+  listar = async (req: Request, res: Response) => {
+    try {
+      const pedidos = await this.service.listar();
+      return res.status(200).json(pedidos);
+    } catch (erro: any) {
+      res.status(erro.status).json({ message: erro.message });
+    }
+  };
+
+  buscarPorId = async (req: Request, res: Response) => {
+    try {
+      const pedido = await this.service.buscarPorId(this.lerId(req));
+      return res.status(200).json(pedido);
+    } catch (erro: any) {
+      res.status(erro.status).json({ message: erro.message });
+    }
+  };
+
+  criar = async (req: Request, res: Response) => {
+    try {
+      const pedido = await this.service.criar(req.body);
+      return res.status(201).json(pedido);
+    } catch (erro: any) {
+      res.status(erro.status).json({ message: erro.message });
+    }
+  };
+
+  atualizar = async (req: Request, res: Response) => {
+    try {
+      const pedido = await this.service.atualizar(this.lerId(req), req.body);
+      return res.status(200).json(pedido);
+    } catch (erro: any) {
+      res.status(erro.status).json({ message: erro.message });
+    }
+  };
+
+  remover = async (req: Request, res: Response) => {
+    try {
+      await this.service.remover(this.lerId(req));
+      return res.status(204).send();
+    } catch (erro: any) {
+      res.status(erro.status).json({ message: erro.message });
+    }
+  };
 }
