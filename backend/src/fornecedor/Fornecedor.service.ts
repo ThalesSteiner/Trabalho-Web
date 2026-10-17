@@ -16,15 +16,15 @@ export class FornecedorService {
   }
 
   async buscarPorCnpj(cnpjrecebido: string): Promise<Fornecedor> {
-    const cnpj = this.validarCnpj(cnpjrecebido);
-    return this.repository.buscarPorCnpj(cnpj);
+    this.validarCnpj(cnpjrecebido);
+    return this.repository.buscarPorCnpj(cnpjrecebido);
   }
 
   async criar(dados: FornecedorSemId): Promise<Fornecedor> {
     this.validarCampos(dados, ['cnpj', 'razaoSocial', 'categorias']);
     this.validarCnpj(dados.cnpj);
     this.validarRazaoSocial(dados.razaoSocial);
-    this.validarCategorias(dados.razaoSocial);
+    this.validarCategorias(dados.categorias);
     const fornecedor: FornecedorSemId = {
       cnpj: dados.cnpj,
       razaoSocial: dados.razaoSocial.trim(),
@@ -40,7 +40,7 @@ export class FornecedorService {
     this.validarCampos(dados, ['cnpj', 'razaoSocial', 'categorias']);
     this.validarCnpj(dados.cnpj);
     this.validarRazaoSocial(dados.razaoSocial);
-    this.validarCategorias(dados.razaoSocial);
+    this.validarCategorias(dados.categorias);
     const fornecedor: FornecedorSemId = {
       cnpj: dados.cnpj,
       razaoSocial: dados.razaoSocial.trim(),
@@ -51,10 +51,10 @@ export class FornecedorService {
     return this.repository.atualizar(id, fornecedor);
   }
 
-  async atualizarParcial(idRecebido: string,bdados: AtualizarParcialFornecedor): Promise<Fornecedor> {
+  async atualizarParcial(idRecebido: string,dados: AtualizarParcialFornecedor): Promise<Fornecedor> {
     const id = this.validarId(idRecebido);
     this.validarCampos(dados, ['cnpj', 'razaoSocial', 'categorias']);
-    if (dados.cnpj === undefined && dados.razaoSocial === undefined && dados.categoria === undefined) {
+    if (dados.cnpj === undefined && dados.razaoSocial === undefined && dados.categorias === undefined) {
       throw { status: 500 , message: "Informe no mínimo um campo para ser atualizado" }
     }
 
@@ -66,13 +66,6 @@ export class FornecedorService {
       this.validarRazaoSocial(dados.razaoSocial);
     }
 
-    if (dados.categorias !== undefined) {
-      this.validarCategorias(dados.categorias);
-      atualizacao.categorias = dados.categorias.map(
-        categoria => categoria.trim()
-      );
-    }
-    
     const atualizacao: AtualizarParcialFornecedor = {};
 
     if (dados.cnpj !== undefined) {

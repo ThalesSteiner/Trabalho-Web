@@ -1,18 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { Knex } from 'knex';
-import { db } from 'main/backend/src/database/dados-mock.ts'
+import { Inject, Injectable } from '@nestjs/common';
+import type { Knex } from 'knex';
+import { KNEX } from '../database/knex.module';
 import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from './Fornecedor.entity';
 
 @Injectable()
 export class FornecedorRepository {
   private readonly tabela = 'fornecedores';
 
+  constructor(@Inject(KNEX) private readonly db: Knex) {}
+
   async listar(): Promise<Fornecedor[]> {
-    return await db<Fornecedor>(this.tabela).select('*');
+    return await this.db<Fornecedor>(this.tabela).select('*');
   }
 
   async buscarPorId(id: number): Promise<Fornecedor> {
-    const fornecedor = await db<Fornecedor>(this.tabela)
+    const fornecedor = await this.db<Fornecedor>(this.tabela)
       .where({ id })
       .first();
 
@@ -23,7 +25,7 @@ export class FornecedorRepository {
   }
 
   async buscarPorCnpj(cnpj: string): Promise<Fornecedor> {
-    const fornecedor = await db<Fornecedor>(this.tabela)
+    const fornecedor = await this.db<Fornecedor>(this.tabela)
       .where({ cnpj })
       .first();
 
@@ -34,14 +36,14 @@ export class FornecedorRepository {
   }
 
   async criar(dados: FornecedorSemId): Promise<Fornecedor> {
-    const [fornecedor] = await db<Fornecedor>(this.tabela)
+    const [fornecedor] = await this.db<Fornecedor>(this.tabela)
       .insert(dados)
       .returning('*');
     return fornecedor;
   }
 
   async atualizar(id: number, dados: FornecedorSemId): Promise<Fornecedor> {
-    const [fornecedor] = await db<Fornecedor>(this.tabela)
+    const [fornecedor] = await this.db<Fornecedor>(this.tabela)
       .where({ id })
       .update(dados)
       .returning('*');
@@ -53,7 +55,7 @@ export class FornecedorRepository {
   }
 
   async atualizarParcial(id: number, dados: AtualizarParcialFornecedor): Promise<Fornecedor> {
-    const [fornecedor] = await db<Fornecedor>(this.tabela)
+    const [fornecedor] = await this.db<Fornecedor>(this.tabela)
       .where({ id })
       .update(dados)
       .returning('*');
@@ -65,7 +67,7 @@ export class FornecedorRepository {
   }
 
   async excluir(id: number): Promise<void> {
-    const quantidade = await db<Fornecedor>(this.tabela)
+    const quantidade = await this.db<Fornecedor>(this.tabela)
       .where({ id })
       .delete();
 
@@ -75,7 +77,7 @@ export class FornecedorRepository {
   }
 
     async buscarCategoriasExistentes(id: number, categoriasBuscadas: string[]): Promise<string[]> { //retorna as categorias que existem em tal id
-  const fornecedor = await db<Fornecedor>(this.tabela)
+  const fornecedor = await this.db<Fornecedor>(this.tabela)
     .where({ id })
     .first();
   if (!fornecedor) {

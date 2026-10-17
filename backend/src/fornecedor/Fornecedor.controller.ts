@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { FornecedorService } from './Fornecedor.service';
 import * as FornecedorEntidade from './Fornecedor.entity';
 
