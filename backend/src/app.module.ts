@@ -8,6 +8,7 @@ import { KnexModule } from './database/knex.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
+import { PromocaoModule } from './promocao/promocao.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TracingMiddleware } from './tracing/tracing.middleware';
     DashboardModule,
     CategoriaCustoModule,
     TestModule,
+    PromocaoModule,
   ],
 })
 export class AppModule implements NestModule {
