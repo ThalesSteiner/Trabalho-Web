@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
-import { KNEX } from '../database/knex.module';
+import { KNEX } from '../common/database/knex.module';
 import { FiltrosDashboardDto, ListarDashboardDto } from './dto/filtros-dashboard.dto';
 const diaDaVenda = "(v.data_hora_venda at time zone 'America/Sao_Paulo')::date";
 

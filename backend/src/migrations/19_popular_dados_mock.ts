@@ -13,7 +13,7 @@ import {
   promocoes,
   senhaPadrao,
   validadePorCategoria,
-} from '../database/dados-mock';
+} from '../common/database/dados-mock';
 
 type Linha = Record<string, unknown>;
 

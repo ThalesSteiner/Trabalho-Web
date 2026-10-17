@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import type { Span } from '@opentelemetry/api';
-import { CurrentSpan } from '../tracing/current-span.decorator';
+import { CurrentSpan } from '../common/tracing/current-span.decorator';
 import { CreateTestDto } from './dto/create-test.dto';
 import { ListTestDto } from './dto/list-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';

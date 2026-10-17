@@ -1,8 +1,8 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { trace } from '@opentelemetry/api';
 import type { Knex } from 'knex';
-import { KNEX } from '../database/knex.module';
-import { Trace } from '../tracing/trace.decorator';
+import { KNEX } from '../common/database/knex.module';
+import { Trace } from '../common/tracing/trace.decorator';
 import { CreateTestDto } from './dto/create-test.dto';
 import { ListTestDto } from './dto/list-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';

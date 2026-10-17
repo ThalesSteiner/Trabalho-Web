@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common';
 import type {Knex} from 'knex';
-import { KNEX } from '../database/knex.module';
+import { KNEX } from '../common/database/knex.module';
 import type { Loja } from './loja.types';
 import {CriarLojaDto } from './dto/criar-loja.dto';
 import { AtualizarLojaDto } from './dto/atualizar-loja.dto';

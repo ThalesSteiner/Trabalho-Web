@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
-import { KNEX } from '../database/knex.module';
+import { KNEX } from '../common/database/knex.module';
 import type { Custo } from './custo.types';
 import { CriarCustoDto } from './dto/criar-custo.dto';
 import { AtualizarCustoDto } from './dto/atualizar-custo.dto';

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
-import { KNEX } from '../database/knex.module';
+import { KNEX } from '../common/database/knex.module';
 import { ListarPrecosDto } from './dto/listar-precos.dto';
 import type { DadosPreco, Preco } from './preco.types';
 

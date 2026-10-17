@@ -1,4 +1,4 @@
-import './tracing/tracer';
+import './common/tracing/tracer';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';

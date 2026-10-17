@@ -6,9 +6,9 @@
     "build": "nest build",
     "start": "npm run migration:run && nest start",
     "start:dev": "npm run migration:run && nest start --watch",
-    "migration:run": "knex migrate:latest --knexfile src/database/knexfile.ts",
-    "migration:revert": "knex migrate:rollback --knexfile src/database/knexfile.ts",
-    "migration:show": "knex migrate:list --knexfile src/database/knexfile.ts",
+    "migration:run": "knex migrate:latest --knexfile src/common/database/knexfile.ts",
+    "migration:revert": "knex migrate:rollback --knexfile src/common/database/knexfile.ts",
+    "migration:show": "knex migrate:list --knexfile src/common/database/knexfile.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\""
   },

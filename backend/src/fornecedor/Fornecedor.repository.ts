@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
-import { KNEX } from '../database/knex.module';
+import { KNEX } from '../common/database/knex.module';
 import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from './Fornecedor.entity';
 
 @Injectable()

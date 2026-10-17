@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
-import { KNEX } from '../database/knex.module';
+import { KNEX } from '../common/database/knex.module';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { NovoPagamento, Pagamento } from './pagamento.types';
 
