@@ -1,12 +1,12 @@
 import { Knex } from 'knex';
 import { db } from '../database/dados-mock'; //acho melhor ser aonde está o db knex do servidor
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra } from './pedido-compra/pedidoCompra.entity.js';
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento } from './pedido-compra/pedidoCompra.entity.js';
 
 type PedidoCompraRow = {
   id: number;
   item: string;
   quantidade: number;
-  forma_pagamento: string;
+  forma_pagamento: FormaPagamento;
 };
 
 const TABELA = 'pedido_compra';
