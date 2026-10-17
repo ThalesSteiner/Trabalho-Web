@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
+import { AtualizarNotaDto } from './dto/atualizar-nota.dto';
 import { ListarNotasDto } from './dto/listar-notas.dto';
 import { NotaFiscal } from './nota-fiscal.types';
 
@@ -59,6 +60,19 @@ export class NotaFiscalRepository {
 
   async cancelar(id: number, trx: Knex) {
     await trx('dim_nota_fiscal').where({ id }).update({ cancelada: true });
+  }
+
+  async atualizar(id: number, dados: AtualizarNotaDto) {
+    await this.knex('dim_nota_fiscal').where({ id }).update(dados);
+  }
+
+  // vendas continuam, so ficam sem nota (-1)
+  async excluir(id: number, trx?: Knex.Transaction): Promise<void> {
+    if (!trx) return this.knex.transaction((t) => this.excluir(id, t));
+
+    await trx('fat_venda').where({ notaFiscalId: id }).update({ notaFiscalId: -1 });
+    await trx('pagamento').where({ notaFiscalId: id }).update({ notaFiscalId: null });
+    await trx('dim_nota_fiscal').where({ id }).delete();
   }
 
   async salvar(nota: Pick<NotaFiscal, 'numero' | 'chaveAcesso' | 'emitidaEm'>, trx: Knex): Promise<NotaFiscal> {

@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { UsuarioToken } from '../auth/auth.decorators';
 import { NotaFiscalService } from '../nota-fiscal/nota-fiscal.service';
+import { AtualizarPagamentoDto } from './dto/atualizar-pagamento.dto';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { GatewayService } from './gateway.service';
@@ -81,6 +82,30 @@ export class PagamentoService {
       await this.repository.atualizar(id, { status: 'ESTORNADO' }, trx);
     });
     return this.repository.buscarPorId(id);
+  }
+
+  async atualizar(id: string, dto: AtualizarPagamentoDto) {
+    if (!(await this.repository.buscarPorId(id))) throw new NotFoundException('Pagamento não encontrado');
+    if (dto.formaPagamentoId && !(await this.repository.buscarForma(dto.formaPagamentoId))) {
+      throw new NotFoundException('Forma de pagamento não encontrada');
+    }
+
+    if (Object.values(dto).every((valor) => valor === undefined)) throw new BadRequestException('Informe ao menos um campo para atualizar');
+
+    await this.repository.atualizar(id, dto);
+    return this.repository.buscarPorId(id);
+  }
+
+  async excluir(id: string) {
+    const pagamento = await this.repository.buscarPorId(id);
+    if (!pagamento) throw new NotFoundException('Pagamento não encontrado');
+
+    await this.repository.transacao(async (trx) => {
+      await this.repository.removerVenda(id, trx);
+      await this.repository.excluir(id, trx);
+      if (pagamento.notaFiscalId) await this.notaFiscalService.remover(pagamento.notaFiscalId, trx);
+    });
+    return { mensagem: 'Pagamento excluído com sucesso' };
   }
 
   private async calcularItem(lojaId: number, itemId: number, quantidade: number): Promise<ItemPago> {

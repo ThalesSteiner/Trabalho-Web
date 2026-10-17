@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { Perfis, Publico, UsuarioAtual, type UsuarioToken } from '../auth/auth.decorators';
+import { AtualizarPagamentoDto } from './dto/atualizar-pagamento.dto';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { PagamentoService } from './pagamento.service';
@@ -35,5 +36,17 @@ export class PagamentoController {
   @HttpCode(200)
   estornar(@Param('id', ParseUUIDPipe) id: string) {
     return this.pagamentoService.estornar(id);
+  }
+
+  @Perfis('ADMIN')
+  @Patch(':id')
+  atualizar(@Param('id', ParseUUIDPipe) id: string, @Body() dto: AtualizarPagamentoDto) {
+    return this.pagamentoService.atualizar(id, dto);
+  }
+
+  @Perfis('ADMIN')
+  @Delete(':id')
+  excluir(@Param('id', ParseUUIDPipe) id: string) {
+    return this.pagamentoService.excluir(id);
   }
 }

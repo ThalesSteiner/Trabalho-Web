@@ -1,5 +1,6 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Query } from '@nestjs/common';
 import { Perfis, Publico } from '../auth/auth.decorators';
+import { AtualizarNotaDto } from './dto/atualizar-nota.dto';
 import { ListarNotasDto } from './dto/listar-notas.dto';
 import { NotaFiscalService } from './nota-fiscal.service';
 
@@ -23,5 +24,17 @@ export class NotaFiscalController {
   @Get(':uuid')
   buscar(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.notaFiscalService.buscarPorUuid(uuid);
+  }
+
+  @Perfis('ADMIN')
+  @Patch(':uuid')
+  atualizar(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() dto: AtualizarNotaDto) {
+    return this.notaFiscalService.atualizar(uuid, dto);
+  }
+
+  @Perfis('ADMIN')
+  @Delete(':uuid')
+  excluir(@Param('uuid', ParseUUIDPipe) uuid: string) {
+    return this.notaFiscalService.excluir(uuid);
   }
 }

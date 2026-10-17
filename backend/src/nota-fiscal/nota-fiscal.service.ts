@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomInt } from 'crypto';
 import type { Knex } from 'knex';
+import { AtualizarNotaDto } from './dto/atualizar-nota.dto';
 import { ListarNotasDto } from './dto/listar-notas.dto';
 import { NotaFiscalRepository } from './nota-fiscal.repository';
 import { NotaFiscal } from './nota-fiscal.types';
@@ -30,6 +31,28 @@ export class NotaFiscalService {
 
   cancelar(id: number, trx: Knex.Transaction) {
     return this.repository.cancelar(id, trx);
+  }
+
+  async atualizar(uuid: string, dto: AtualizarNotaDto) {
+    const nota = await this.repository.buscarPorUuid(uuid);
+    if (!nota) throw new NotFoundException('Nota fiscal não encontrada');
+
+    if (Object.values(dto).every((valor) => valor === undefined)) throw new BadRequestException('Informe ao menos um campo para atualizar');
+
+    await this.repository.atualizar(nota.id, dto);
+    return this.buscarPorUuid(uuid);
+  }
+
+  async excluir(uuid: string) {
+    const nota = await this.repository.buscarPorUuid(uuid);
+    if (!nota) throw new NotFoundException('Nota fiscal não encontrada');
+
+    await this.repository.excluir(nota.id);
+    return { mensagem: 'Nota fiscal excluída com sucesso' };
+  }
+
+  remover(id: number, trx: Knex.Transaction) {
+    return this.repository.excluir(id, trx);
   }
 
   private async detalhar(nota?: NotaFiscal) {
