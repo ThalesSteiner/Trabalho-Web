@@ -8,7 +8,9 @@
     "start:dev": "npm run migration:run && nest start --watch",
     "migration:run": "knex migrate:latest --knexfile src/database/knexfile.ts",
     "migration:revert": "knex migrate:rollback --knexfile src/database/knexfile.ts",
-    "migration:show": "knex migrate:list --knexfile src/database/knexfile.ts"
+    "migration:show": "knex migrate:list --knexfile src/database/knexfile.ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
   },
   "dependencies": {
     "@keyv/redis": "^6.1.0",
@@ -47,6 +49,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^22.0.0",
     "@types/passport-jwt": "^4.0.1",
+    "prettier": "3.9.10",
     "supabase": "^2.120.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
