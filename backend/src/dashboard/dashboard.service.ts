@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { DashboardRepository } from './dashboard.repository';
 import { FiltrosDashboardDto, ListarDashboardDto} from './dto/filtros-dashboard.dto';
 
@@ -30,10 +30,10 @@ export class DashboardService {
   }
     private async validarFiltros(filtros: FiltrosDashboardDto) {
     if (filtros.de && filtros.ate && filtros.de > filtros.ate) {
-      throw { status: 400, message: 'A data inicial não pode ser posterior à data final' };
+      throw new BadRequestException('A data inicial não pode ser posterior à data final');
     }
     if (filtros.lojaId !== undefined && !await this.repository.buscarLoja(filtros.lojaId)) {
-      throw { status: 404, message: 'Loja não encontrada' };
+      throw new NotFoundException('Loja não encontrada');
     }
   }
 }
