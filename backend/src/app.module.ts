@@ -12,6 +12,7 @@ import { TracingMiddleware } from './common/tracing/tracing.middleware';
 import { PromocaoModule } from './promocao/promocao.module';
 import{LojaModule} from './loja/loja.module';
 import{EstoqueModule} from './estoque/estoque.module';
+import { PrecoModule } from './preco/preco.module';
 
 @Module({
   imports: [
@@ -26,6 +27,8 @@ import{EstoqueModule} from './estoque/estoque.module';
     CategoriaCustoModule,
     TestModule,
     PromocaoModule,
+    EstoqueModule,
+    PrecoModule,
   ],
 })
 export class AppModule implements NestModule {
