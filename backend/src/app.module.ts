@@ -1,5 +1,5 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import {MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CustoModule } from './custo/custo.module';
 import{DashboardModule} from './dashboard/dashboard.module';
@@ -9,6 +9,7 @@ import { PagamentoModule } from './pagamento/pagamento.module';
 import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
 import { PromocaoModule } from './promocao/promocao.module';
+import{LojaModule} from './loja/loja.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PromocaoModule } from './promocao/promocao.module';
     PagamentoModule,
     CustoModule,
     DashboardModule,
+    LojaModule,
     CategoriaCustoModule,
     TestModule,
     PromocaoModule,
