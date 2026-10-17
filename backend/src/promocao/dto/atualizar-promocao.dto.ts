@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
-import { TIPOS_PROMOCAO, type TipoPromocao } from './criar-promocao.dto';
+import { TIPOS_PROMOCAO, type TipoPromocao } from '../promocao.types';
 
 export class AtualizarPromocaoDto {
   @IsOptional()

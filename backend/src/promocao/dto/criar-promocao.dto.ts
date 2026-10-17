@@ -18,7 +18,7 @@ export class CriarPromocaoDto {
   nome: string;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 2, allowNaN: false, allowInfinity: false })
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
   @Max(99999999.99)
   valor?: number | null;
@@ -26,12 +26,10 @@ export class CriarPromocaoDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(2147483647)
   qtdLeve?: number | null;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(2147483647)
   qtdPague?: number | null;
 }

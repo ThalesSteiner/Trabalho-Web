@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, Max, Min, ValidateIf } from 'class-validator';
+import { IsIn, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { TIPOS_PROMOCAO, type TipoPromocao } from '../promocao.types';
 
 export class ListarPromocoesDto {
@@ -15,14 +15,14 @@ export class ListarPromocoesDto {
   @Max(100)
   limit = 10;
 
-  @ValidateIf((_obj, value) => value !== undefined)
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(Number.MAX_SAFE_INTEGER)
   itemId?: number;
 
-  @ValidateIf((_obj, value) => value !== undefined)
+  @IsOptional()
   @IsIn(TIPOS_PROMOCAO)
   tipoPromocaoId?: TipoPromocao;
 }
