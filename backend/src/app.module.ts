@@ -7,6 +7,7 @@ import { CategoriaCustoModule } from './categoria-custo/categoria-custo.module';
 import { KnexModule } from './common/database/knex.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { TestModule } from './test/test.module';
+import { RedisModule } from './common/redis/redis.module';
 import { TracingMiddleware } from './common/tracing/tracing.middleware';
 import { PromocaoModule } from './promocao/promocao.module';
 import{LojaModule} from './loja/loja.module';
@@ -16,6 +17,7 @@ import{EstoqueModule} from './estoque/estoque.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     KnexModule,
+    RedisModule,
     AuthModule,
     PagamentoModule,
     CustoModule,
