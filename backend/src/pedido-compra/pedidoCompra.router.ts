@@ -14,3 +14,5 @@ rota.get('/:id', controller.buscarPorId);
 rota.post('/', controller.criar);
 rota.put('/:id', controller.atualizar);
 rota.delete('/:id', controller.remover);
+rota.get('/:id/promocao', controller.buscarPromocao); //esse volta se tem uma promoção com o item de tal id
+rota.get('/:id/total', controller.calcularTotal); //esse volta o custo total do pedido-compra
