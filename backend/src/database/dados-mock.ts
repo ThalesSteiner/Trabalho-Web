@@ -13,7 +13,7 @@ export const condominios = [
   { id: 10, nome: 'Condomínio Pedra de Itaúna', bairro: 'Barra da Tijuca', latitude: -23.00729, longitude: -43.422209, lojas: ['Mercadinho Pedra de Itaúna'] },
   { id: 11, nome: 'Ilha Pura', bairro: 'Barra Olímpica', latitude: -22.985512, longitude: -43.417923, lojas: ['Mercadinho Ilha Pura'] },
   { id: 12, nome: 'Selva de Pedra', bairro: 'Leblon', latitude: -22.980328, longitude: -43.219668, lojas: ['Mercadinho Selva de Pedra'] },
-  { id: 13, nome: 'Cruzada São Sebastião', bairro: 'Leblon', latitude: -22.98198, longitude: -43.215882, lojas: ['Mercadinho Cruzada'] },
+  { id: 13, nome: 'Cruzada São Sebastião', bairro: 'Leblon', latitude: -22.98198, longitude: -43.215882, lojas: ['Mercadinho Cruzada'] }
 ];
 
 export const lojas = condominios.flatMap((c) =>
@@ -51,7 +51,7 @@ export const fornecedores = [
   { id: 2, razaoSocial: 'Laticínios Serra Azul S.A.', categorias: ['Laticínios', 'Congelados'], cnpj: 22345678901234  },
   { id: 3, razaoSocial: 'Atacadão Mercearia Paulista Ltda', categorias: ['Mercearia', 'Limpeza', 'Higiene'], cnpj: 32345678901234  },
   { id: 4, razaoSocial: 'Padaria Pão Dourado Ltda', categorias: ['Padaria'], cnpj: 42345678901234  },
-  { id: 5, razaoSocial: 'Hortifruti Campo Verde Ltda', categorias: ['Hortifruti'], cnpj: 52345678901234  },
+  { id: 5, razaoSocial: 'Hortifruti Campo Verde Ltda', categorias: ['Hortifruti'], cnpj: 52345678901234  }
 ];
 
 export const validadePorCategoria: Record<string, number> = {
@@ -62,7 +62,7 @@ export const validadePorCategoria: Record<string, number> = {
   Limpeza: 720,
   Higiene: 720,
   Hortifruti: 8,
-  Congelados: 120,
+  Congelados: 120
 };
 
 export const itens = [
@@ -87,7 +87,7 @@ export const itens = [
   { id: 19,nome: 'Banana prata kg', categoria: 'Hortifruti', preco: 6.99 },
   { id: 20,nome: 'Tomate kg', categoria: 'Hortifruti', preco: 8.49 },
   { id: 21,nome: 'Pizza congelada 460g', categoria: 'Congelados', preco: 19.9 },
-  { id: 22,nome: 'Sorvete 1,5L', categoria: 'Congelados', preco: 24.9 },
+  { id: 22,nome: 'Sorvete 1,5L', categoria: 'Congelados', preco: 24.9 }
 ];
 
 export const promocoes = [
@@ -97,7 +97,7 @@ export const promocoes = [
   { id: 4,item: 'Refrigerante lata 350ml', nome: 'Refrigerante leve 3 pague 2', tipo: 'LEVE_PAGUE', leve: 3, pague: 2 },
 ];
 
-export const formasPagamento = ['PIX', 'Cartão de crédito', 'Cartão de débito', 'Vale-alimentação'];
+export const formasPagamento = ['PIX', 'Cartão de crédito', 'Cartão de débito', 'Vale-alimentação'] as const;
 
 export const categoriasCusto = ['Aluguel', 'Energia', 'Internet', 'Manutenção do totem', 'Limpeza', 'Salários'];
 
@@ -123,5 +123,5 @@ export const pedidosCompra = [
   { id: 19, item: 'Banana prata kg', quantidade: 2, formaPagamento: 'Vale-alimentação' },
   { id: 20, item: 'Tomate kg', quantidade: 1, formaPagamento: 'PIX' },
   { id: 21, item: 'Pizza congelada 460g', quantidade: 2, formaPagamento: 'Cartão de débito' },
-  { id: 22, item: 'Sorvete 1,5L', quantidade: 1, formaPagamento: 'Cartão de crédito' },
+  { id: 22, item: 'Sorvete 1,5L', quantidade: 1, formaPagamento: 'Cartão de crédito' }
 ];
