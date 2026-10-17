@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { FornecedorRepository } from 'main/backend/src/fornecedor/Fornecedor.repository.ts';
-import { Fornecedor , FornecedorSemId, AtualizarParcialFornecedor} from 'main/backend/src/fornecedor/Fornecedor.entity.ts';
+import { FornecedorRepository } from './Fornecedor.repository';
+import { Fornecedor , FornecedorSemId, AtualizarParcialFornecedor} from './Fornecedor.entity';
 
 @Injectable()
 export class FornecedorService {

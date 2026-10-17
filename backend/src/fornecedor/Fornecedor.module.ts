@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { FornecedorController } from 'main/backend/src/fornecedor/Fornecedor.controller.ts';
-import { FornecedorService } from 'main/backend/src/fornecedor/Fornecedor.service.ts';
-import { FornecedorRepository } from 'main/backend/src/fornecedor/Fornecedor.repository.ts';
+import { FornecedorController } from './Fornecedor.controller';
+import { FornecedorService } from './Fornecedor.service';
+import { FornecedorRepository } from './Fornecedor.repository';
 
 @Module({
   controllers: [FornecedorController],

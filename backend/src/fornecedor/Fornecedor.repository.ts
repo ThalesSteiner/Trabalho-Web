@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { db } from 'main/backend/src/database/dados-mock.ts'
-import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from 'main/backend/src/fornecedor/Fornecedor.entity.ts';
+import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from './Fornecedor.entity';
 
 @Injectable()
 export class FornecedorRepository {
