@@ -10,6 +10,7 @@ import { TestModule } from './test/test.module';
 import { TracingMiddleware } from './tracing/tracing.middleware';
 import { PromocaoModule } from './promocao/promocao.module';
 import{LojaModule} from './loja/loja.module';
+import{EstoqueModule} from './estoque/estoque.module';
 
 @Module({
   imports: [
