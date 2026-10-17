@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'; //agora tentando sem usar decorator pra treinar
-import { PedidoCompraService } from './pedido-compra.service.ts';
+import { PedidoCompraService } from './pedidoCompra.service';
 
 export class PedidoCompraController {
   constructor(private readonly service: PedidoCompraService) {}
@@ -61,7 +61,7 @@ export class PedidoCompraController {
     try {
       const promocao = await this.service.buscarPromocao(this.lerId(req));
       return res.status(200).json(promocao);
-    } catch (erro) {
+    } catch (erro: any) {
       return res.status(erro.status).json({ message: erro.message });
     }
   };
@@ -70,7 +70,7 @@ export class PedidoCompraController {
     try {
       const total = await this.service.calcularTotal(this.lerId(req));
       return res.status(200).json(total);
-    } catch (erro) {
+    } catch (erro: any) {
       return res.status(erro.status).json({ message: erro.message });
     }
   };

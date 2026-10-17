@@ -1,6 +1,6 @@
-import { PedidoCompraRepository } from './pedido-compra.repository.ts';
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra } from './pedido-compra.entity.ts';
-import { formasPagamento } from './database.dados-mock.ts'; 
+import { PedidoCompraRepository } from './pedidoCompra.repository';
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra } from './pedidoCompra.entity';
+import { formasPagamento } from '../common/database/dados-mock'; 
 
 export class PedidoCompraService {
   constructor(private readonly repository: PedidoCompraRepository) {}

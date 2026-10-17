@@ -1,6 +1,7 @@
-import { Knex } from 'knex';
-import { db } from '../database/dados-mock'; //acho melhor ser aonde está o db knex do servidor
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento, Promocao, Item } from './pedido-compra/pedidoCompra.entity.js';
+import { Inject, Injectable } from '@nestjs/common';
+import type { Knex } from 'knex';
+import { KNEX } from '../common/database/knex.module';
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento, Promocao, Item } from './pedidoCompra.entity';
 
 type PedidoCompraRow = {
   id: number;
@@ -28,8 +29,9 @@ type ItemRow = {
 
 const TABELA = 'pedido_compra';
 
+@Injectable()
 export class PedidoCompraRepository {
-  constructor(private readonly knex: Knex = db) {}
+  constructor(@Inject(KNEX) private readonly knex: Knex) {}
 
   private paraEntity(row: PedidoCompraRow): PedidoCompra {
     return new PedidoCompra(row.id, row.item, row.quantidade, row.forma_pagamento);

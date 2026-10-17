@@ -1,7 +1,7 @@
-import { formasPagamento } from './database/dados-mock';
+import { formasPagamento } from '../common/database/dados-mock';
 
 export class PedidoCompra {
-  constructor(public id: number, public item: string, public quantidade: number,public formaPagamento: string) {}
+  constructor(public id: number, public item: string, public quantidade: number,public formaPagamento: FormaPagamento) {}
 }
 export type FormaPagamento = (typeof formasPagamento)[number];
  

@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import { PedidoCompraRepository } from './pedido-compra.repository.ts';
-import { PedidoCompraService } from './pedido-compra.service.ts';
-import { PedidoCompraController } from './pedido-compra.controller.ts';
+import knex from 'knex';
+import config from '../common/database/knexfile';
+import { PedidoCompraRepository } from './pedidoCompra.repository';
+import { PedidoCompraService } from './pedidoCompra.service';
+import { PedidoCompraController } from './pedidoCompra.controller';
 
-const repository = new PedidoCompraRepository();
+const repository = new PedidoCompraRepository(knex(config));
 const service = new PedidoCompraService(repository);
 const controller = new PedidoCompraController(service);
 
