@@ -1,12 +1,29 @@
 import { Knex } from 'knex';
 import { db } from '../database/dados-mock'; //acho melhor ser aonde está o db knex do servidor
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento } from './pedido-compra/pedidoCompra.entity.js';
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento, Promocao, Item } from './pedido-compra/pedidoCompra.entity.js';
 
 type PedidoCompraRow = {
   id: number;
   item: string;
   quantidade: number;
   forma_pagamento: FormaPagamento;
+};
+
+type PromocaoRow = {
+  id: number;
+  item: string;
+  nome: string;
+  tipo: string;
+  valor: number | string | null;
+  leve: number | null;
+  pague: number | null;
+};
+
+type ItemRow = {
+  id: number;
+  nome: string;
+  categoria: string;
+  preco: number | string;
 };
 
 const TABELA = 'pedido_compra';
@@ -50,5 +67,24 @@ export class PedidoCompraRepository {
   async remover(id: number): Promise<boolean> {
     const removidos = await this.knex<PedidoCompraRow>(TABELA).where({ id }).del();
     return removidos > 0;
+  }
+
+  async buscarPromocaoPorItem(nomeItem: string): Promise<Promocao | null> {//volta o row com promoção se tiver
+    const row = await this.knex<PromocaoRow>('promocoes').where({ item: nomeItem }).first();
+    if (!row) return null;
+    return new Promocao(
+      row.id,
+      row.item,
+      row.nome,
+      row.tipo,
+      row.valor === null ? null : Number(row.valor),
+      row.leve,
+      row.pague,
+    );
+  }
+
+  async buscarItemPorNome(nome: string): Promise<Item | null> { //busca o item na tabela itens
+    const row = await this.knex<ItemRow>('itens').where({ nome }).first();
+    return row ? new Item(row.id, row.nome, row.categoria, Number(row.preco)) : null;
   }
 }
