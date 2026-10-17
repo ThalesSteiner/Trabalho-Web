@@ -17,7 +17,7 @@ export class PedidoCompraController {
       const pedidos = await this.service.listar();
       return res.status(200).json(pedidos);
     } catch (erro: any) {
-      res.status(erro.status).json({ message: erro.message });
+      return res.status(erro.status).json({ message: erro.message });
     }
   };
 
@@ -26,7 +26,7 @@ export class PedidoCompraController {
       const pedido = await this.service.buscarPorId(this.lerId(req));
       return res.status(200).json(pedido);
     } catch (erro: any) {
-      res.status(erro.status).json({ message: erro.message });
+      return res.status(erro.status).json({ message: erro.message });
     }
   };
 
@@ -35,7 +35,7 @@ export class PedidoCompraController {
       const pedido = await this.service.criar(req.body);
       return res.status(201).json(pedido);
     } catch (erro: any) {
-      res.status(erro.status).json({ message: erro.message });
+      return res.status(erro.status).json({ message: erro.message });
     }
   };
 
@@ -44,7 +44,7 @@ export class PedidoCompraController {
       const pedido = await this.service.atualizar(this.lerId(req), req.body);
       return res.status(200).json(pedido);
     } catch (erro: any) {
-      res.status(erro.status).json({ message: erro.message });
+      return res.status(erro.status).json({ message: erro.message });
     }
   };
 
@@ -53,7 +53,25 @@ export class PedidoCompraController {
       await this.service.remover(this.lerId(req));
       return res.status(204).send();
     } catch (erro: any) {
-      res.status(erro.status).json({ message: erro.message });
+      return res.status(erro.status).json({ message: erro.message });
+    }
+  };
+
+  buscarPromocao = async (req: Request, res: Response) => {
+    try {
+      const promocao = await this.service.buscarPromocao(this.lerId(req));
+      return res.status(200).json(promocao);
+    } catch (erro) {
+      return res.status(erro.status).json({ message: erro.message });
+    }
+  };
+
+  calcularTotal = async (req: Request, res: Response) => {
+    try {
+      const total = await this.service.calcularTotal(this.lerId(req));
+      return res.status(200).json(total);
+    } catch (erro) {
+      return res.status(erro.status).json({ message: erro.message });
     }
   };
 }
