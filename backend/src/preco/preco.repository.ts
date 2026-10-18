@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
-import { ListarPrecosDto } from './dto/listar-precos.dto';
+import { HistoricoPrecoDto, ListarPrecosDto } from './dto/listar-precos.dto';
 import type { DadosPreco, Preco } from './preco.types';
 
 @Injectable()
@@ -32,16 +32,21 @@ export class PrecoRepository {
     const consulta = this.knex('dim_preco');
     if (filtros.itemId !== undefined) consulta.where('itemId', filtros.itemId);
     if (filtros.lojaId !== undefined) consulta.where('lojaId', filtros.lojaId);
+    if (filtros.valor !== undefined) consulta.where('valor', filtros.valor);
     const [{ total }] = await consulta.clone().count({ total: '*' });
     const data: Preco[] = await consulta.select('*').orderBy('inicioVigencia', 'desc').orderBy('id', 'desc')
       .offset((filtros.page - 1) * filtros.limit).limit(filtros.limit);
     return { data, total: Number(total), page: filtros.page, limit: filtros.limit };
   }
 
-  historico(itemId: number, lojaId?: number): Promise<Preco[]> {
+  async historico(itemId: number, filtros: HistoricoPrecoDto) {
     const consulta = this.knex('dim_preco').where({ itemId });
-    if (lojaId !== undefined) consulta.where('lojaId', lojaId);
-    return consulta.select('*').orderBy('inicioVigencia', 'asc').orderBy('id', 'asc');
+    if (filtros.lojaId !== undefined) consulta.where('lojaId', filtros.lojaId);
+    if (filtros.valor !== undefined) consulta.where('valor', filtros.valor);
+    const [{ total }] = await consulta.clone().count({ total: '*' });
+    const data: Preco[] = await consulta.select('*').orderBy('inicioVigencia', 'asc').orderBy('id', 'asc')
+      .offset((filtros.page - 1) * filtros.limit).limit(filtros.limit);
+    return { data, total: Number(total), page: filtros.page, limit: filtros.limit };
   }
 
   async encerrarAnteriorAberto(dados: DadosPreco, trx: Knex) {
