@@ -1,27 +1,53 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { plainToInstance, Transform, Type } from 'class-transformer';
-import { IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min, validate } from 'class-validator';
-import { formasPagamento } from '../common/database/dados-mock';
-import type { FormaPagamento } from './pedidoCompra.entity';
+import { Transform, Type } from 'class-transformer';
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
 
 export class CriarPedidoCompraDto {
-  @Transform(trim)
-  @IsString({ message: 'item deve ser um texto' })
-  @IsNotEmpty({ message: 'item não pode ser vazio' })
-  item: string;
+  @IsInt({ message: 'lojaId deve ser um número inteiro' })
+  @Min(1)
+  lojaId: number;
+
+  @IsInt({ message: 'itemId deve ser um número inteiro' })
+  @Min(1)
+  itemId: number;
+
+  @IsInt({ message: 'fornecedorId deve ser um número inteiro' })
+  @Min(1)
+  fornecedorId: number;
 
   @IsInt({ message: 'quantidade deve ser um número inteiro' })
   @Min(1, { message: 'quantidade deve ser maior que zero' })
+  @Max(100000)
   quantidade: number;
 
-  @IsIn([...formasPagamento], { message: 'forma de pagamento inválida.' })
-  formaPagamento: FormaPagamento;
+  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'custo unitário deve ter no máximo 2 casas decimais' })
+  @Min(0.01, { message: 'custo unitário deve ser maior que zero' })
+  custoUnitario: number;
+
+  @Transform(trim)
+  @IsString({ message: 'lote deve ser um texto' })
+  @IsNotEmpty({ message: 'lote não pode ser vazio' })
+  @MaxLength(60)
+  lote: string;
+
+  @IsOptional()
+  @IsDateString()
+  dataValidade?: string;
 }
 
-export class AtualizarPedidoCompraDto extends PartialType(CriarPedidoCompraDto) {}
+export class AtualizarPedidoCompraDto {
+  @IsOptional()
+  @IsInt({ message: 'fornecedorId deve ser um número inteiro' })
+  @Min(1)
+  fornecedorId?: number;
+
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'custo unitário deve ter no máximo 2 casas decimais' })
+  @Min(0.01, { message: 'custo unitário deve ser maior que zero' })
+  custoUnitario?: number;
+}
 
 export class ListarPedidosCompraDto {
   @IsOptional()
@@ -38,13 +64,19 @@ export class ListarPedidosCompraDto {
   limite?: number;
 
   @IsOptional()
-  @Transform(trim)
-  @IsString({ message: 'item deve ser um texto' })
-  item?: string;
+  @Type(() => Number)
+  @IsInt({ message: 'lojaId deve ser um inteiro' })
+  lojaId?: number;
 
   @IsOptional()
-  @IsIn([...formasPagamento], { message: 'forma de pagamento inválida.' })
-  formaPagamento?: FormaPagamento;
+  @Type(() => Number)
+  @IsInt({ message: 'itemId deve ser um inteiro' })
+  itemId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'fornecedorId deve ser um inteiro' })
+  fornecedorId?: number;
 
   @IsOptional()
   @Type(() => Number)
@@ -57,20 +89,4 @@ export class ListarPedidosCompraDto {
   @IsInt({ message: 'quantidade máxima deve ser um inteiro' })
   @Min(0, { message: 'quantidade máxima deve ser maior ou igual a zero' })
   quantidadeMax?: number;
-}
-
-export async function validarDto<T extends object>(classe: new () => T,dados: unknown): Promise<T> {
-  if (dados === null || typeof dados !== 'object' || Array.isArray(dados)) {
-    throw { status: 400, message: 'Os dados devem estar em um json válido' };
-  }
-  const instancia = plainToInstance(classe, dados);
-  const erros = await validate(instancia, {
-    whitelist: true,
-    forbidNonWhitelisted: true
-  });
-  if (erros.length > 0) {
-    const mensagens = erros.flatMap((e) => Object.values(e.constraints ?? {}));
-    throw { status: 400, message: mensagens };
-  }
-  return instancia;
 }

@@ -1,17 +1,22 @@
-import { formasPagamento } from '../common/database/dados-mock';
-
 export class PedidoCompra {
-  constructor(public id: number, public item: string, public quantidade: number,public formaPagamento: FormaPagamento) {}
+  constructor(public id: number,
+    public dataRecebimento: string,
+    public lojaId: number,
+    public itemId: number,
+    public fornecedorId: number,
+    public funcionarioId: number,
+    public quantidade: number,
+    public custoUnitario: number
+  ) {}
 }
-export type FormaPagamento = (typeof formasPagamento)[number];
- 
+
 export type CriarPedidoCompra = Omit<PedidoCompra, 'id'>;
- 
-export type AtualizarPedidoCompra = Partial<CriarPedidoCompra>;
+
+export type AtualizarPedidoCompra = Partial<Pick<PedidoCompra, 'fornecedorId' | 'custoUnitario'>>;
 
 export class Promocao {
   constructor(public id: number,
-    public item: string,
+    public itemId: number,
     public nome: string,
     public tipo: string,
     public valor: number | null,
@@ -20,24 +25,17 @@ export class Promocao {
   ) {}
 }
 
-export class Item {
-  constructor(public id: number,
-    public nome: string,
-    public categoria: string,
-    public preco: number
-  ) {}
-}
-
 export type TotalPedidoCompra = {pedidoId: number;
   item: string;
   quantidade: number;
-  precoUnitario: number;
+  custoUnitario: number;
   total: number;
 };
 
 export type FiltrosPedidoCompra = {
-  item?: string;
-  formaPagamento?: FormaPagamento;
+  lojaId?: number;
+  itemId?: number;
+  fornecedorId?: number;
   quantidadeMin?: number;
   quantidadeMax?: number;
 };
