@@ -23,7 +23,7 @@ export class CriarCustoDto {
   @MaxLength(200)
   descricao?: string;
 
-  @IsNumber({ maxDecimalPlaces: 2, allowNaN: false, allowInfinity: false })
+  @IsNumber({ maxDecimalPlaces: 2})
   @Min(0.01)
   @Max(9999999999.99)
   valor: number;
