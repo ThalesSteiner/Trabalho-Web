@@ -1,6 +1,7 @@
 import { PedidoCompraRepository } from './pedidoCompra.repository';
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra } from './pedidoCompra.entity';
-import { formasPagamento } from '../common/database/dados-mock'; 
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra,  ResultadoPaginado } from './pedidoCompra.entity';
+import { formasPagamento } from '../common/database/dados-mock';
+import { CriarPedidoCompraDto, AtualizarPedidoCompraDto, ListarPedidosCompraDto, validarDto } from './pedidoCompra.dto';
 
 export class PedidoCompraService {
   constructor(private readonly repository: PedidoCompraRepository) {}
@@ -22,8 +23,14 @@ export class PedidoCompraService {
     }
   }
 
-  listar(): Promise<PedidoCompra[]> {
-    return this.repository.listar();
+  async listar(query: unknown): Promise<ResultadoPaginado<PedidoCompra>> {
+    const dto = await validarDto(ListarPedidosCompraDto, query);
+    const { pagina, limite, ...filtros } = dto;
+
+    if (filtros.quantidadeMin !== undefined && filtros.quantidadeMax !== undefined && filtros.quantidadeMin > filtros.quantidadeMax) {
+      throw { status: 400, message: 'quantidade mínima não pode ser maior que quantidade máxima' };
+    }
+    return this.repository.listar(filtros, pagina ?? 1, limite ?? 10);
   }
 
   async buscarPorId(id: number): Promise<PedidoCompra> {
@@ -32,14 +39,14 @@ export class PedidoCompraService {
     return pedido;
   }
 
-  criar(dados: CriarPedidoCompra): Promise<PedidoCompra> {
-    this.validar(dados, true);
-    return this.repository.criar(dados);
+  async criar(dados: unknown): Promise<PedidoCompra> {
+    const dto = await validarDto(CriarPedidoCompraDto, dados);
+    return this.repository.criar(dto);
   }
 
-  async atualizar(id: number, dados: AtualizarPedidoCompra): Promise<PedidoCompra> {
-    this.validar(dados, false);
-    const pedido = await this.repository.atualizar(id, dados);
+  async atualizar(id: number, dados: unknown): Promise<PedidoCompra> {
+    const dto = await validarDto(AtualizarPedidoCompraDto, dados);
+    const pedido = await this.repository.atualizar(id, dto);
     if (!pedido) throw { status: 404, message: 'Pedido de compra não encontrado' };
     return pedido;
   }
