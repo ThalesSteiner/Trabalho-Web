@@ -16,3 +16,17 @@ export type AtualizarParcialFornecedor = {
   categorias?: string[];
   cnpj?: string;
 };
+
+export type FiltrosFornecedor = {
+  razaoSocial?: string;
+  cnpj?: string;
+  categoria?: string;
+};
+
+export type ResultadoPaginado<T> = {
+  dados: T[];
+  total: number;
+  pagina: number;
+  limite: number;
+  totalPaginas: number;
+};
