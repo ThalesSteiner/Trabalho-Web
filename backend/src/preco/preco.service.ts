@@ -10,32 +10,26 @@ export class PrecoService {
   constructor(private readonly repository: PrecoRepository) {}
 
   listar(filtros: ListarPrecosDto) {
-    if (filtros.lojaId !== undefined) this.validarLojaId(filtros.lojaId);
     return this.repository.listar(filtros);
   }
 
   async buscarPorId(id: number) {
-    this.validarId(id);
     const preco = await this.repository.buscarPorId(id);
     if (!preco) throw new NotFoundException('Preço não encontrado');
     return preco;
   }
 
   async historico(itemId: number, filtros: HistoricoPrecoDto) {
-    this.validarId(itemId);
     const item = await this.repository.buscarItem(itemId);
     if (!item) throw new NotFoundException('Item não encontrado');
     if (filtros.lojaId !== undefined) {
-      this.validarLojaId(filtros.lojaId);
       if (!await this.repository.buscarLoja(filtros.lojaId)) throw new NotFoundException('Loja não encontrada');
     }
-    return { item, data: await this.repository.historico(itemId, filtros.lojaId) };
+    return { item, ...await this.repository.historico(itemId, filtros) };
   }
 
   criar(dto: CriarPrecoDto) {
-    this.validarLojaId(dto.lojaId);
     const dados: DadosPreco = { ...dto, fimVigencia: dto.fimVigencia ?? null };
-    this.validarPeriodo(dados);
     return this.gravar(() => this.repository.transacao(async trx => {
       if (!await this.repository.bloquearItem(dto.itemId, trx)) throw new NotFoundException('Item não encontrado');
       if (!await this.repository.buscarLoja(dto.lojaId, trx)) throw new NotFoundException('Loja não encontrada');
@@ -53,7 +47,6 @@ export class PrecoService {
   async atualizar(id: number, dto: AtualizarPrecoDto) {
     const anterior = await this.buscarPorId(id);
     const campos = Object.fromEntries(Object.entries(dto).filter(([, valor]) => valor !== undefined));
-    if (!Object.keys(campos).length) throw new BadRequestException('Informe pelo menos um campo para atualizar');
     return this.gravar(() => this.repository.transacao(async trx => {
       await this.repository.bloquearItem(anterior.itemId, trx);
       const atual = await this.repository.buscarPorId(id, trx);
@@ -88,16 +81,6 @@ export class PrecoService {
       await this.repository.excluir(id, trx);
       return { mensagem: 'Preço excluído com sucesso' };
     }));
-  }
-
-  private validarId(id: number) {
-    if (!Number.isSafeInteger(id) || id <= 0) throw new BadRequestException('Informe um ID positivo válido');
-  }
-
-  private validarLojaId(id: number) {
-    if (!Number.isSafeInteger(id) || (id !== -1 && id <= 0)) {
-      throw new BadRequestException('lojaId deve ser positivo ou -1 para o preço padrão de todas as lojas');
-    }
   }
 
   private validarPeriodo(dados: Pick<Preco, 'inicioVigencia' | 'fimVigencia'>) {
