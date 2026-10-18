@@ -37,7 +37,8 @@ export class AuthService {
   }
 
   private async gerarToken(login: Login) {
-    const token = await this.jwt.signAsync({ sub: login.usuarioId, perfil: login.perfil });
+    const lojaId = login.perfil === 'FUNCIONARIO' ? await this.usuarioRepository.lojaDoFuncionario(login.usuarioId) : undefined;
+    const token = await this.jwt.signAsync({ sub: login.usuarioId, perfil: login.perfil, lojaId });
     return { token };
   }
 }

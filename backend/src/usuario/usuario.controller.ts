@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { Perfis } from '../auth/auth.decorators';
 import { AtualizarUsuarioDto } from './dto/atualizar-usuario.dto';
+import { CriarUsuarioDto } from './dto/criar-usuario.dto';
 import { ListarUsuariosDto } from './dto/listar-usuarios.dto';
 import { UsuarioService } from './usuario.service';
 
@@ -17,6 +18,11 @@ export class UsuarioController {
   @Get(':id')
   buscar(@Param('id', ParseUUIDPipe) id: string) {
     return this.usuarioService.buscar(id);
+  }
+
+  @Post()
+  criar(@Body() dto: CriarUsuarioDto) {
+    return this.usuarioService.criar(dto);
   }
 
   @Patch(':id')

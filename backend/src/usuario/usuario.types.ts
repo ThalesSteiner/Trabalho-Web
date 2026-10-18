@@ -14,3 +14,8 @@ export type Login = {
   senhaHash: string;
   perfil: Perfil;
 };
+
+export type Funcionario = {
+  lojaId: number;
+  cargo?: string;
+};

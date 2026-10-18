@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { Perfil } from '../usuario/usuario.types';
 
-export type UsuarioToken = { sub: string; perfil: Perfil };
+export type UsuarioToken = { sub: string; perfil: Perfil; lojaId?: number };
 
 export const Publico = () => SetMetadata('publico', true);
 

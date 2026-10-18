@@ -1,28 +1,15 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
-import type { Perfil } from '../usuario.types';
+import { OmitType, PartialType } from '@nestjs/swagger';
+import { IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { CriarUsuarioDto } from './criar-usuario.dto';
 
-export class AtualizarUsuarioDto {
+export class AtualizarUsuarioDto extends PartialType(OmitType(CriarUsuarioDto, ['lojaId', 'cargo'])) {
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
-  nome?: string;
-
-  @IsOptional()
-  @Matches(/^\d{11}$/, { message: 'cpf deve ter 11 números' })
-  cpf?: string;
-
-  @IsOptional()
-  @IsEmail()
-  @MaxLength(160)
-  email?: string;
+  @IsInt()
+  @Min(1)
+  lojaId?: number;
 
   @IsOptional()
   @IsString()
-  @MinLength(8)
-  senha?: string;
-
-  @IsOptional()
-  @IsIn(['ADMIN', 'CLIENTE', 'FUNCIONARIO'])
-  perfil?: Perfil;
+  @MaxLength(20)
+  cargo?: string;
 }
