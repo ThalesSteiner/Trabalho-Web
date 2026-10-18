@@ -47,13 +47,13 @@ export async function validarDto<T extends object>(classe: new () => T, dados: u
 
   const instancia = plainToInstance(classe, dados);
   const erros = await validate(instancia, {
-    certos: true,
-    validar: true
+    whitelist: true,
+    forbidNonWhitelisted: true
   });
 
   if (erros.length > 0) {
     const mensagens = erros.flatMap((e) => Object.values(e.constraints ?? {}));
-    throw {status: 500, message: mensagens}
+    throw {status: 400, message: mensagens}
   }
 
   return instancia;
