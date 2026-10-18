@@ -7,6 +7,7 @@ import { CategoriaCustoModule } from './categoria-custo/categoria-custo.module';
 import { KnexModule } from './common/database/knex.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { TestModule } from './test/test.module';
+import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { RedisModule } from './common/redis/redis.module';
 import { TracingMiddleware } from './common/tracing/tracing.middleware';
 import { PromocaoModule } from './promocao/promocao.module';
@@ -21,6 +22,7 @@ import { CatalogoModule } from './catalogo/catalogo.module';
     ConfigModule.forRoot({ isGlobal: true }),
     KnexModule,
     RedisModule,
+    RateLimitModule,
     AuthModule,
     PagamentoModule,
     CustoModule,

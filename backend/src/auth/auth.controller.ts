@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { LimiteLogin } from '../common/rate-limit/rate-limit.module';
 import { Publico, UsuarioAtual, type UsuarioToken } from './auth.decorators';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -9,6 +10,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Publico()
+  @LimiteLogin()
   @Post('login')
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
@@ -16,6 +18,7 @@ export class AuthController {
   }
 
   @Publico()
+  @LimiteLogin()
   @Post('registrar')
   registrar(@Body() dto: RegistrarDto) {
     return this.authService.registrar(dto);
