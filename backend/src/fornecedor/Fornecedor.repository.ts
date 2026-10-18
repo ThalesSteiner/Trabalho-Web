@@ -9,9 +9,32 @@ export class FornecedorRepository {
 
   constructor(@Inject(KNEX) private readonly db: Knex) {}
 
-  async listar(): Promise<Fornecedor[]> {
-    return await this.db<Fornecedor>(this.tabela).select('*');
-  }
+  async listar(filtros: FiltrosFornecedor,pagina: number,limite: number): Promise<ResultadoPaginado<Fornecedor>>{
+  const aplicarFiltros = (qb: Knex.QueryBuilder) => {
+    if (filtros.razaoSocial){
+      qb.whereILike('razaoSocial', `%${filtros.razaoSocial}%`);
+    }
+    if (filtros.cnpj){
+      qb.where('cnpj', 'like', `${filtros.cnpj}%`);
+    }
+    if (filtros.categoria){
+      qb.whereRaw('EXISTS (SELECT 1 FROM unnest(categorias) AS c WHERE lower(c) = lower(?))',[filtros.categoria]);
+    }
+  };
+  const [{ total }] = await this.db(this.tabela).modify(aplicarFiltros).count<{ total: string }[]>('* as total');
+
+  const dados = await this.db<Fornecedor>(this.tabela).modify(aplicarFiltros).select('*').orderBy('id').limit(limite).offset((pagina - 1) * limite);
+
+  const totalNumero = Number(total);
+
+  return {
+    dados,
+    total: totalNumero,
+    pagina,
+    limite,
+    totalPaginas: Math.ceil(totalNumero / limite),
+  };
+}
 
   async buscarPorId(id: number): Promise<Fornecedor> {
     const fornecedor = await this.db<Fornecedor>(this.tabela)
