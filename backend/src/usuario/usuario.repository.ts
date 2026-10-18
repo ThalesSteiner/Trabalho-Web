@@ -76,11 +76,12 @@ export class UsuarioRepository {
     });
   }
 
-  async listar({ page, limit, nome, email, perfil }: ListarUsuariosDto) {
+  async listar({ page, limit, nome, email, perfil, lojaId }: ListarUsuariosDto) {
     const filtro = this.comPerfil(this.knex('usuario as u'));
     if (nome) filtro.whereILike('u.nome', `%${nome}%`);
     if (email) filtro.whereILike('l.email', `%${email}%`);
     if (perfil) filtro.where('l.perfil', perfil);
+    if (lojaId) filtro.where('f.lojaId', lojaId);
 
     const [{ total }] = await filtro.clone().count({ total: '*' });
     const data = await filtro
