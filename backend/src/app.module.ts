@@ -14,6 +14,7 @@ import{LojaModule} from './loja/loja.module';
 import{EstoqueModule} from './estoque/estoque.module';
 import { PrecoModule } from './preco/preco.module';
 import { ItemModule } from './item/item.module';
+import { CatalogoModule } from './catalogo/catalogo.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ItemModule } from './item/item.module';
     EstoqueModule,
     PrecoModule,
     ItemModule,
+    CatalogoModule,
   ],
 })
 export class AppModule implements NestModule {
