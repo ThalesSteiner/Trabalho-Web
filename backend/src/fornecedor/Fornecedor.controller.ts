@@ -1,43 +1,48 @@
-import { Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, HttpCode, HttpStatus, Query, ParseIntPipe } from '@nestjs/common';
+import { Perfis } from '../auth/auth.decorators';
 import { FornecedorService } from './Fornecedor.service';
-import * as FornecedorEntidade from './Fornecedor.entity';
+import { AtualizarFornecedorDto, AtualizarParcialFornecedorDto, BuscarCategoriasExistentesDto, CriarFornecedorDto, ListarFornecedoresDto } from './Fornecedor.dto';
 
+@Perfis('ADMIN')
 @Controller('fornecedores')
 export class FornecedorController {
   constructor(private service: FornecedorService) {}
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get()
-  listar(@Query() query: unknown) {return this.service.listar(query);}
+  listar(@Query() query: ListarFornecedoresDto) {return this.service.listar(query);}
 
-  @Get(':id')
-  buscarPorId(@Param('id') id: string) { return this.service.buscarPorId(id);}
-
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get('cnpj/:cnpj')
   buscarPorCnpj(@Param('cnpj') cnpj: string) { return this.service.buscarPorCnpj(cnpj);}
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
+  @Get(':id')
+  buscarPorId(@Param('id', ParseIntPipe) id: number) { return this.service.buscarPorId(id);}
+
   @Post()
-  criar(@Body() dados: FornecedorEntidade.FornecedorSemId) {return this.service.criar(dados);}
+  criar(@Body() dados: CriarFornecedorDto) {return this.service.criar(dados);}
 
   @Put(':id')
-  atualizar(@Param('id') id: string, @Body() dados: FornecedorEntidade.FornecedorSemId) {
+  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dados: AtualizarFornecedorDto) {
     return this.service.atualizar(id, dados);
   }
 
   @Patch(':id')
-  atualizarParcial(@Param('id') id: string,@Body() dados: FornecedorEntidade.AtualizarParcialFornecedor) {
+  atualizarParcial(@Param('id', ParseIntPipe) id: number,@Body() dados: AtualizarParcialFornecedorDto) {
     return this.service.atualizarParcial(id, dados);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  excluir(@Param('id') id: string) {
+  excluir(@Param('id', ParseIntPipe) id: number) {
     return this.service.excluir(id);
   }
 
-  @Get(':id/categorias')//recebe as categorias que você quiser procurar do body, e retorna quais tem caso tenham no id escolhido
-  buscarCategoriasExistentes(@Param('id') id: string, @Query('categorias') categorias: string) {
-    const listaCategorias = categorias ? categorias.split(','): [];
-    return this.service.buscarCategoriasExistentes(id,listaCategorias);
+  @Perfis('ADMIN', 'FUNCIONARIO')
+  @Get(':id/categorias')//recebe as categorias que você quiser procurar na query, e retorna quais tem caso tenham no id escolhido
+  buscarCategoriasExistentes(@Param('id', ParseIntPipe) id: number, @Query() query: BuscarCategoriasExistentesDto) {
+    return this.service.buscarCategoriasExistentes(id, query.categorias);
   }
-  
+
 }
