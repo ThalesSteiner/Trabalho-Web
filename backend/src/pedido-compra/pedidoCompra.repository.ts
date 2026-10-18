@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento, Promocao, Item } from './pedidoCompra.entity';
+import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, FormaPagamento, Promocao, Item, FiltrosPedidoCompra, ResultadoPaginado } from './pedidoCompra.entity';
 
 type PedidoCompraRow = {
   id: number;
@@ -37,10 +37,32 @@ export class PedidoCompraRepository {
     return new PedidoCompra(row.id, row.item, row.quantidade, row.forma_pagamento);
   }
 
-  async listar(): Promise<PedidoCompra[]> {
-    const rows = await this.knex<PedidoCompraRow>(TABELA).select('*').orderBy('id');
-    return rows.map((r) => this.paraEntity(r));
-  }
+  async listar(filtros: FiltrosPedidoCompra, pagina: number, limite: number): Promise<ResultadoPaginado<PedidoCompra>> {
+  const aplicarFiltros = (qb: Knex.QueryBuilder) =>{
+    if (filtros.item) {
+      qb.whereILike('item', `%${filtros.item}%`);
+    }
+    if (filtros.formaPagamento) {
+      qb.where('forma_pagamento', filtros.formaPagamento);
+    }
+    if (filtros.quantidadeMin !== undefined) {
+      qb.where('quantidade', '>=', filtros.quantidadeMin);
+    }
+    if (filtros.quantidadeMax !== undefined) {
+      qb.where('quantidade', '<=', filtros.quantidadeMax);
+    }
+  };
+  const [{ total }] = await this.knex(TABELA).modify(aplicarFiltros).count<{ total: string }[]>('* as total');
+  const rows = await this.knex<PedidoCompraRow>(TABELA).modify(aplicarFiltros).select('*').orderBy('id').limit(limite).offset((pagina - 1) * limite);
+  const totalNumero = Number(total);
+  return {
+    dados: rows.map((r) => this.paraEntity(r)),
+    total: totalNumero,
+    pagina,
+    limite,
+    totalPaginas: Math.ceil(totalNumero / limite),
+  };
+}
 
   async buscarPorId(id: number): Promise<PedidoCompra | null>{
     const row = await this.knex<PedidoCompraRow>(TABELA).where({ id }).first();
