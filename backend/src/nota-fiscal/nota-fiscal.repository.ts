@@ -17,8 +17,8 @@ export class NotaFiscalRepository {
         q.select(1).from('fat_venda as v').where('v.notaFiscalId', this.knex.ref('n.id')).where('v.lojaId', lojaId),
       );
     }
-    if (de) filtro.where('n.emitidaEm', '>=', de);
-    if (ate) filtro.where('n.emitidaEm', '<=', ate);
+    if (de) filtro.whereRaw("n.emitida_em >= (?::date)::timestamp at time zone 'America/Sao_Paulo'", [de]);
+    if (ate) filtro.whereRaw("n.emitida_em < (?::date + 1)::timestamp at time zone 'America/Sao_Paulo'", [ate]);
 
     const [{ total }] = await filtro.clone().count({ total: '*' });
     const data: NotaFiscal[] = await filtro
@@ -66,7 +66,6 @@ export class NotaFiscalRepository {
     await this.knex('dim_nota_fiscal').where({ id }).update(dados);
   }
 
-  // vendas continuam, so ficam sem nota (-1)
   async excluir(id: number, trx?: Knex.Transaction): Promise<void> {
     if (!trx) return this.knex.transaction((t) => this.excluir(id, t));
 

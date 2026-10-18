@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
+import { ListarFormasDto } from './dto/listar-formas.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { NovoPagamento, Pagamento } from './pagamento.types';
 
@@ -35,8 +36,8 @@ export class PagamentoRepository {
     if (status) filtro.where('p.status', status);
     if (lojaId) filtro.where('p.lojaId', lojaId);
     if (formaPagamentoId) filtro.where('p.formaPagamentoId', formaPagamentoId);
-    if (de) filtro.where('p.criadoEm', '>=', de);
-    if (ate) filtro.where('p.criadoEm', '<=', ate);
+    if (de) filtro.whereRaw("p.criado_em >= (?::date)::timestamp at time zone 'America/Sao_Paulo'", [de]);
+    if (ate) filtro.whereRaw("p.criado_em < (?::date + 1)::timestamp at time zone 'America/Sao_Paulo'", [ate]);
 
     const [{ total }] = await filtro.clone().count({ total: '*' });
     const data = await this.comNota(filtro)
@@ -46,8 +47,18 @@ export class PagamentoRepository {
     return { data, total: Number(total) };
   }
 
-  formas(): Promise<{ id: number; nome: string }[]> {
-    return this.knex('dim_forma_pagamento').select('id', 'nome').orderBy('id');
+  async formas({ page, limit, id, nome }: ListarFormasDto) {
+    const filtro = this.knex('dim_forma_pagamento');
+    if (id) filtro.where({ id });
+    if (nome) filtro.whereILike('nome', `%${nome}%`);
+
+    const [{ total }] = await filtro.clone().count({ total: '*' });
+    const data: { id: number; nome: string }[] = await filtro
+      .select('id', 'nome')
+      .orderBy('id')
+      .offset((page - 1) * limit)
+      .limit(limit);
+    return { data, total: Number(total) };
   }
 
   buscarLoja(id: number): Promise<{ id: number; nome: string } | undefined> {
