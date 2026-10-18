@@ -28,6 +28,8 @@ const criarSorteio = (semente: number) => () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
+const meiaNoite = (data: string) => `${data}T00:00:00-03:00`;
+
 const dia = (deslocamento: number) => {
   const data = new Date(Date.now() - 3 * 60 * 60 * 1000);
   data.setUTCHours(12, 0, 0, 0);
@@ -196,7 +198,7 @@ export async function up(knex: Knex) {
   const precoIds = await inserir(
     knex,
     'dim_preco',
-    precos,
+    precos.map((p) => ({ ...p, inicio_vigencia: meiaNoite(p.inicio_vigencia), fim_vigencia: p.fim_vigencia && meiaNoite(p.fim_vigencia) })),
     `id, item_id, loja_id, to_char(inicio_vigencia, 'YYYY-MM-DD') as inicio`,
   );
   const tabelaDePrecos = precos.map((p) => ({
