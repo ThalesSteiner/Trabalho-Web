@@ -80,7 +80,10 @@ const inserir = async (knex: Knex, tabela: string, linhas: Linha[], retorno = 'i
 
 const mapa = (linhas: Linha[], chave: string) => new Map(linhas.map((l) => [String(l[chave]), Number(l.id)]));
 
-export async function up(knex: Knex) {
+// apaga os dados de exemplo e cria de novo, então pode rodar quantas vezes quiser
+export async function seed(knex: Knex) {
+  await limpar(knex);
+
   const sorteio = criarSorteio(2026);
   const entre = (min: number, max: number) => min + Math.floor(sorteio() * (max - min + 1));
   const umDe = <T>(lista: T[]) => lista[Math.floor(sorteio() * lista.length)];
@@ -136,7 +139,7 @@ export async function up(knex: Knex) {
     await inserir(
       knex,
       'dim_funcionario',
-      funcionarios.map((f, i) => ({ usuario_id: usuarioIds[i + 1], nome: f.nome, cargo: f.cargo })),
+      funcionarios.map((f, i) => ({ usuario_id: usuarioIds[i + 1], loja_id: lojaIds[f.loja], nome: f.nome, cargo: f.cargo })),
       'id, usuario_id',
     ),
     'usuario_id',
@@ -164,7 +167,7 @@ export async function up(knex: Knex) {
     await inserir(
       knex,
       'dim_fornecedor',
-      fornecedores.map((f, i) => ({ razao_social: f.razaoSocial, cnpj: cnpj(i + 1) })),
+      fornecedores.map((f, i) => ({ razao_social: f.razaoSocial, cnpj: cnpj(i + 1), categorias: f.categorias })),
       'id, razao_social',
     ),
     'razao_social',
@@ -386,24 +389,32 @@ export async function up(knex: Knex) {
   await inserir(knex, 'fat_custo', custos);
 }
 
-export async function down(knex: Knex) {
-  for (const tabela of ['pagamento', 'fat_custo', 'fat_estoque', 'fat_compra', 'fat_venda']) {
+async function limpar(knex: Knex) {
+  for (const tabela of ['pagamento', 'fat_estoque', ...fatos]) {
     await knex.raw(`delete from ${tabela}`);
   }
-  for (const tabela of [
-    'dim_preco',
-    'dim_promocao',
-    'dim_nota_fiscal',
-    'dim_item',
-    'dim_cliente',
-    'dim_funcionario',
-    'dim_fornecedor',
-    'dim_forma_pagamento',
-    'dim_categoria_custo',
-    'dim_loja',
-  ]) {
+  for (const tabela of dimensoes) {
     await knex.raw(`delete from ${tabela} where id <> -1`);
   }
   await knex.raw(`delete from usuario`);
   await knex.raw(`alter sequence nota_fiscal_numero_seq restart`);
+
+  // ids voltam a começar do 1, então cada seed gera sempre os mesmos ids
+  for (const tabela of [...fatos, ...dimensoes]) {
+    await knex.raw(`alter table ${tabela} alter column id restart`);
+  }
 }
+
+const fatos = ['fat_custo', 'fat_compra', 'fat_venda'];
+const dimensoes = [
+  'dim_preco',
+  'dim_promocao',
+  'dim_nota_fiscal',
+  'dim_item',
+  'dim_cliente',
+  'dim_funcionario',
+  'dim_fornecedor',
+  'dim_forma_pagamento',
+  'dim_categoria_custo',
+  'dim_loja',
+];

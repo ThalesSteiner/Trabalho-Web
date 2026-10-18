@@ -9,6 +9,8 @@
     "migration:run": "knex migrate:latest --knexfile src/common/database/knexfile.ts",
     "migration:revert": "knex migrate:rollback --knexfile src/common/database/knexfile.ts",
     "migration:show": "knex migrate:list --knexfile src/common/database/knexfile.ts",
+    "seed:run": "knex seed:run --knexfile src/common/database/knexfile.ts",
+    "db:recriar": "npm run migration:run && npm run seed:run",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\""
   },

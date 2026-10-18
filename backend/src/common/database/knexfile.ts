@@ -7,6 +7,7 @@ const config: Knex.Config = {
   client: 'pg',
   connection: process.env.DATABASE_URL,
   migrations: { directory: join(__dirname, '..', '..', 'migrations'), loadExtensions: ['.ts'] },
+  seeds: { directory: join(__dirname, '..', '..', 'seeds'), loadExtensions: ['.ts'] },
 };
 
 export default config;
