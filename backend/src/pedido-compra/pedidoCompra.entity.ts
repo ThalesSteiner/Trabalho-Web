@@ -34,3 +34,18 @@ export type TotalPedidoCompra = {pedidoId: number;
   precoUnitario: number;
   total: number;
 };
+
+export type FiltrosPedidoCompra = {
+  item?: string;
+  formaPagamento?: FormaPagamento;
+  quantidadeMin?: number;
+  quantidadeMax?: number;
+};
+
+export type ResultadoPaginado<T> = {
+  dados: T[];
+  total: number;
+  pagina: number;
+  limite: number;
+  totalPaginas: number;
+};
