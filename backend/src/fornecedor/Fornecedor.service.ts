@@ -7,8 +7,10 @@ import { CriarFornecedorDto, AtualizarFornecedorDto, AtualizarParcialFornecedorD
 export class FornecedorService{
   constructor(private readonly repository: FornecedorRepository) {}
 
-  async listar(): Promise<Fornecedor[]>{
-    return this.repository.listar();
+  async listar(query: unknown): Promise<ResultadoPaginado<Fornecedor>>{
+    const dto = await validarDto(ListarFornecedoresDto, query);
+    const { pagina, limite, ...filtros } = dto;
+    return this.repository.listar(filtros, pagina ?? 1, limite ?? 10);
   }
 
   async buscarPorId(idRecebido: string): Promise<Fornecedor>{
