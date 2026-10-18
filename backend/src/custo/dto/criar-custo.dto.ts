@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsDateString, IsInt, IsNumber, IsString, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { IsDateString, IsInt, IsNumber, IsString, Matches, Max, MaxLength, Min, ValidateIf, NotEquals } from 'class-validator';
 
 export class CriarCustoDto {
   @IsDateString({ strict: true })
@@ -8,6 +8,7 @@ export class CriarCustoDto {
 
   @IsInt()
   @Min(-1)
+  @NotEquals(0, { message: 'lojaId deve ser positivo ou -1 para a matriz' })
   @Max(Number.MAX_SAFE_INTEGER)
   lojaId: number;
 

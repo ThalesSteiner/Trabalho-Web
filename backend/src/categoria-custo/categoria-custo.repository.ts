@@ -2,13 +2,25 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
 import type { CategoriaCusto } from './categoria-custo.types';
+import { ListarCategoriasCustoDto } from './dto/listar-categorias-custo.dto';
 
 @Injectable()
 export class CategoriaCustoRepository {
   constructor(@Inject(KNEX) private readonly knex: Knex) {}
 
-  listar(): Promise<CategoriaCusto[]> {
-    return this.knex('dim_categoria_custo').select('id', 'nome').orderBy('nome');
+  async listar(filtros: ListarCategoriasCustoDto) {
+    const consulta = this.knex('dim_categoria_custo');
+
+    if (filtros.id !== undefined) consulta.where('id', filtros.id);
+    if (filtros.nome) consulta.whereILike('nome', `%${filtros.nome}%`);
+
+    const [{ total }] = await consulta.clone().count({ total: '*' });
+
+    const data: CategoriaCusto[] = await consulta.select('id', 'nome')
+      .orderBy('nome').orderBy('id')
+      .offset((filtros.page - 1) * filtros.limit).limit(filtros.limit);
+
+    return { data, total: Number(total), page: filtros.page, limit: filtros.limit };
   }
 
   buscarPorId(id: number): Promise<CategoriaCusto | undefined> {

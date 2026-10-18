@@ -1,18 +1,18 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CategoriaCustoRepository } from './categoria-custo.repository';
 import { CriarCategoriaCustoDto } from './dto/criar-categoria-custo.dto';
 import { AtualizarCategoriaCustoDto } from './dto/atualizar-categoria-custo.dto';
+import { ListarCategoriasCustoDto } from './dto/listar-categorias-custo.dto';
 
 @Injectable()
 export class CategoriaCustoService {
   constructor(private readonly repository: CategoriaCustoRepository) {}
 
-  listar() {
-    return this.repository.listar();
+  listar(filtros: ListarCategoriasCustoDto) {
+    return this.repository.listar(filtros);
   }
 
   async buscarPorId(id: number) {
-    this.validarId(id);
     const categoria = await this.repository.buscarPorId(id);
     if (!categoria) throw new NotFoundException('Categoria de custo não encontrada');
     return categoria;
@@ -23,14 +23,12 @@ export class CategoriaCustoService {
   }
 
   async atualizar(id: number, dto: AtualizarCategoriaCustoDto) {
-    this.validarId(id);
     const categoria = await this.repository.atualizar(id, dto.nome);
     if (!categoria) throw new NotFoundException('Categoria de custo não encontrada');
     return categoria;
   }
 
   async excluir(id: number) {
-    this.validarId(id);
     if (await this.repository.possuiCustos(id)) {
       throw new ConflictException('A categoria possui despesas vinculadas e não pode ser excluída');
     }
@@ -44,9 +42,5 @@ export class CategoriaCustoService {
       }
       throw erro;
     }
-  }
-
-  private validarId(id: number) {
-    if (!Number.isSafeInteger(id) || id <= 0) throw new BadRequestException('Informe um ID positivo válido');
   }
 }

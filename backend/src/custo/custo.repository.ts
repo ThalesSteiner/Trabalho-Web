@@ -55,22 +55,32 @@ export class CustoRepository {
     };
   }
 
-  async resumoPorCategoria(filtros: FiltrosCustoDto) {
+  async resumoPorCategoria(filtros: ListarCustosDto) {
+    const consulta = this.filtrar(this.knex('fat_custo as c'), filtros)
+      .innerJoin('dim_categoria_custo as cat', 'cat.id', 'c.categoriaCustoId');
+
+    const [{ total }] = await consulta.clone().countDistinct({ total: 'cat.id' });
+
     const resultados: {
       categoriaCustoId: number;
       categoria: string;
       quantidadeDespesas: string | number;
       totalGasto: string | number;
-    }[] = await this.filtrar(this.knex('fat_custo as c'), filtros)
-      .innerJoin('dim_categoria_custo as cat', 'cat.id', 'c.categoriaCustoId')
+    }[] = await consulta
       .select('cat.id as categoriaCustoId', 'cat.nome as categoria')
-      .count({ quantidadeDespesas: 'c.id' }).sum({ totalGasto: 'c.valor' })
-      .groupBy('cat.id', 'cat.nome').orderBy('cat.nome');
-    return resultados.map(resultado => ({
+      .count({ quantidadeDespesas: 'c.id' })
+      .sum({ totalGasto: 'c.valor' })
+      .groupBy('cat.id', 'cat.nome')
+      .orderBy('cat.nome').orderBy('cat.id')
+      .offset((filtros.page - 1) * filtros.limit).limit(filtros.limit);
+
+    const data = resultados.map(resultado => ({
       ...resultado,
       quantidadeDespesas: Number(resultado.quantidadeDespesas),
       totalGasto: Number(resultado.totalGasto)
     }));
+
+    return { data, total: Number(total), page: filtros.page, limit: filtros.limit };
   }
 
   private filtrar(consulta: Knex.QueryBuilder, filtros: FiltrosCustoDto) {

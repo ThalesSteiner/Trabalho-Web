@@ -1,8 +1,9 @@
 import { Transform } from 'class-transformer';
-import { IsDateString, IsInt, IsNumber, IsString, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { IsDateString, IsInt, IsNumber, IsString, Matches, Max, MaxLength, Min, ValidateIf, NotEquals, IsDefined } from 'class-validator';
 
 export class AtualizarCustoDto {
-  @ValidateIf((_obj, value) => value !== undefined)
+  @ValidateIf((dto, value) => value !== undefined || Object.values(dto).every(campo => campo === undefined))
+  @IsDefined({ message: 'Informe pelo menos um campo para atualizar' })
   @IsDateString({ strict: true })
   @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'dataCusto deve estar no formato AAAA-MM-DD' })
   dataCusto?: string;
@@ -10,6 +11,7 @@ export class AtualizarCustoDto {
   @ValidateIf((_obj, value) => value !== undefined)
   @IsInt()
   @Min(-1)
+  @NotEquals(0, { message: 'lojaId deve ser positivo ou -1 para a matriz' })
   @Max(Number.MAX_SAFE_INTEGER)
   lojaId?: number;
 
