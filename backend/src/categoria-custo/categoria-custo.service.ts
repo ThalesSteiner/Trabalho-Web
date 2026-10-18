@@ -18,11 +18,13 @@ export class CategoriaCustoService {
     return categoria;
   }
 
-  criar(dto: CriarCategoriaCustoDto) {
+  async criar(dto: CriarCategoriaCustoDto) {
+    await this.validarNomeUnico(dto.nome);
     return this.repository.criar(dto.nome);
   }
 
   async atualizar(id: number, dto: AtualizarCategoriaCustoDto) {
+    await this.validarNomeUnico(dto.nome, id);
     const categoria = await this.repository.atualizar(id, dto.nome);
     if (!categoria) throw new NotFoundException('Categoria de custo não encontrada');
     return categoria;
@@ -42,5 +44,10 @@ export class CategoriaCustoService {
       }
       throw erro;
     }
+  }
+
+  private async validarNomeUnico(nome: string, id?: number) {
+    const existente = await this.repository.buscarPorNome(nome);
+    if (existente && existente.id !== id) throw new ConflictException('Já existe uma categoria com esse nome');
   }
 }

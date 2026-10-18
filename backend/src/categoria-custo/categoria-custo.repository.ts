@@ -27,6 +27,10 @@ export class CategoriaCustoRepository {
     return this.knex('dim_categoria_custo').where({ id }).first('id', 'nome');
   }
 
+  buscarPorNome(nome: string): Promise<CategoriaCusto | undefined> {
+    return this.knex('dim_categoria_custo').whereRaw('lower(nome) = lower(?)', [nome.trim()]).first('id', 'nome');
+  }
+
   async criar(nome: string): Promise<CategoriaCusto> {
     const [categoria] = await this.knex('dim_categoria_custo').insert({ nome }).returning(['id', 'nome']);
     return categoria;
