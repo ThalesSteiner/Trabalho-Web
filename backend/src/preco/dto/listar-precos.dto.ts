@@ -1,16 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsInt, IsNumber, Max, Min, NotEquals, ValidateIf } from 'class-validator';
 
-export class HistoricoPrecoDto {
-  @IsOptional()
+export class ItemIdParamDto {
   @Type(() => Number)
   @IsInt()
-  @Min(-1)
+  @Min(1)
   @Max(Number.MAX_SAFE_INTEGER)
-  lojaId?: number;
+  itemId: number;
 }
 
-export class ListarPrecosDto extends HistoricoPrecoDto {
+export class HistoricoPrecoDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
@@ -23,7 +22,24 @@ export class ListarPrecosDto extends HistoricoPrecoDto {
   @Max(100)
   limit = 10;
 
-  @IsOptional()
+  @ValidateIf((_obj, value) => value !== undefined)
+  @Type(() => Number)
+  @IsInt()
+  @Min(-1)
+  @NotEquals(0, { message: 'lojaId deve ser positivo ou -1 para o preço padrão de todas as lojas' })
+  @Max(Number.MAX_SAFE_INTEGER)
+  lojaId?: number;
+
+  @ValidateIf((_obj, value) => value !== undefined)
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0.01)
+  @Max(99999999.99)
+  valor?: number;
+}
+
+export class ListarPrecosDto extends HistoricoPrecoDto {
+  @ValidateIf((_obj, value) => value !== undefined)
   @Type(() => Number)
   @IsInt()
   @Min(1)
