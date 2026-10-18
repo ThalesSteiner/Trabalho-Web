@@ -11,12 +11,14 @@ import {
   Query,
 } from '@nestjs/common';
 import type { Span } from '@opentelemetry/api';
+import { Perfis } from '../auth/auth.decorators';
 import { CurrentSpan } from '../common/tracing/current-span.decorator';
 import { CreateTestDto } from './dto/create-test.dto';
 import { ListTestDto } from './dto/list-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestService } from './test.service';
 
+@Perfis('ADMIN')
 @Controller('test')
 export class TestController {
   constructor(private readonly testService: TestService) {}
