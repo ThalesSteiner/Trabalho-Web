@@ -1,5 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Knex } from 'knex';
 import type { UsuarioToken } from '../auth/auth.decorators';
+import { EstoqueService } from '../estoque/estoque.service';
 import { NotaFiscalService } from '../nota-fiscal/nota-fiscal.service';
 import { AtualizarPagamentoDto } from './dto/atualizar-pagamento.dto';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
@@ -7,7 +9,7 @@ import { ListarFormasDto } from './dto/listar-formas.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { GatewayService } from './gateway.service';
 import { PagamentoRepository, Promocao } from './pagamento.repository';
-import { ItemPago } from './pagamento.types';
+import { ItemPago, Pagamento } from './pagamento.types';
 
 const centavos = (valor: number) => Math.round(valor * 100) / 100;
 
@@ -17,6 +19,7 @@ export class PagamentoService {
     private readonly repository: PagamentoRepository,
     private readonly gateway: GatewayService,
     private readonly notaFiscalService: NotaFiscalService,
+    private readonly estoqueService: EstoqueService,
   ) {}
 
   async formas(filtros: ListarFormasDto) {
@@ -45,6 +48,11 @@ export class PagamentoService {
     if (!forma) throw new NotFoundException('Forma de pagamento não encontrada');
 
     const itensPagos = await Promise.all(itens.map((item) => this.calcularItem(lojaId, item.itemId, item.quantidade)));
+    for (const [itemId, quantidade] of this.quantidadePorItem(itens)) {
+      if ((await this.estoqueService.disponivel(lojaId, itemId)) < quantidade) {
+        throw new ConflictException(`Item ${itemId} sem estoque suficiente nesta loja`);
+      }
+    }
     const valor = centavos(itensPagos.reduce((soma, item) => soma + item.valorPago, 0));
     const pagamento = await this.repository.criar({ usuarioId, lojaId, formaPagamentoId, itens: itensPagos, valor });
 
@@ -60,6 +68,9 @@ export class PagamentoService {
         const nota = await this.notaFiscalService.emitir(trx);
         const clienteId = await this.repository.clienteDoUsuario(usuarioId, trx);
         await this.repository.registrarVenda({ ...pagamento, processadoEm }, clienteId, nota.id, trx);
+        for (const [itemId, quantidade] of this.quantidadePorItem(itens)) {
+          await this.estoqueService.registrarBaixa({ lojaId, itemId, quantidade }, trx);
+        }
         await this.repository.atualizar(
           pagamento.id,
           { status: 'APROVADO', codigoTransacao: resposta.codigo, notaFiscalId: nota.id, processadoEm },
@@ -67,7 +78,7 @@ export class PagamentoService {
         );
       });
     } catch (erro) {
-      await this.repository.atualizar(pagamento.id, { status: 'RECUSADO', motivo: 'Falha ao emitir nota fiscal', processadoEm });
+      await this.repository.atualizar(pagamento.id, { status: 'RECUSADO', motivo: 'Falha ao finalizar a venda', processadoEm });
       throw erro;
     }
     return this.repository.buscarPorId(pagamento.id);
@@ -80,6 +91,7 @@ export class PagamentoService {
 
     await this.repository.transacao(async (trx) => {
       await this.repository.removerVenda(id, trx);
+      await this.devolverEstoque(pagamento, trx);
       await this.notaFiscalService.cancelar(pagamento.notaFiscalId, trx);
       await this.repository.atualizar(id, { status: 'ESTORNADO' }, trx);
     });
@@ -104,10 +116,23 @@ export class PagamentoService {
 
     await this.repository.transacao(async (trx) => {
       await this.repository.removerVenda(id, trx);
+      if (pagamento.status === 'APROVADO') await this.devolverEstoque(pagamento, trx);
       await this.repository.excluir(id, trx);
       if (pagamento.notaFiscalId) await this.notaFiscalService.remover(pagamento.notaFiscalId, trx);
     });
     return { mensagem: 'Pagamento excluído com sucesso' };
+  }
+
+  private async devolverEstoque(pagamento: Pagamento, trx: Knex.Transaction) {
+    for (const [itemId, quantidade] of this.quantidadePorItem(pagamento.itens)) {
+      await this.estoqueService.devolver(pagamento.lojaId, itemId, quantidade, trx);
+    }
+  }
+
+  private quantidadePorItem(itens: { itemId: number; quantidade: number }[]) {
+    const total = new Map<number, number>();
+    for (const { itemId, quantidade } of itens) total.set(itemId, (total.get(itemId) ?? 0) + quantidade);
+    return total;
   }
 
   private async calcularItem(lojaId: number, itemId: number, quantidade: number): Promise<ItemPago> {
