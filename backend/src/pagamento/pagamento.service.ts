@@ -3,6 +3,7 @@ import type { UsuarioToken } from '../auth/auth.decorators';
 import { NotaFiscalService } from '../nota-fiscal/nota-fiscal.service';
 import { AtualizarPagamentoDto } from './dto/atualizar-pagamento.dto';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
+import { ListarFormasDto } from './dto/listar-formas.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { GatewayService } from './gateway.service';
 import { PagamentoRepository, Promocao } from './pagamento.repository';
@@ -18,8 +19,9 @@ export class PagamentoService {
     private readonly notaFiscalService: NotaFiscalService,
   ) {}
 
-  formas() {
-    return this.repository.formas();
+  async formas(filtros: ListarFormasDto) {
+    const { data, total } = await this.repository.formas(filtros);
+    return { data, total, page: filtros.page, limit: filtros.limit };
   }
 
   async listar(usuario: UsuarioToken, filtros: ListarPagamentosDto) {

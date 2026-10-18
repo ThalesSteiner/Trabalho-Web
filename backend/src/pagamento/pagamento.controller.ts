@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, P
 import { Perfis, Publico, UsuarioAtual, type UsuarioToken } from '../auth/auth.decorators';
 import { AtualizarPagamentoDto } from './dto/atualizar-pagamento.dto';
 import { CriarPagamentoDto } from './dto/criar-pagamento.dto';
+import { ListarFormasDto } from './dto/listar-formas.dto';
 import { ListarPagamentosDto } from './dto/listar-pagamentos.dto';
 import { PagamentoService } from './pagamento.service';
 
@@ -11,8 +12,8 @@ export class PagamentoController {
 
   @Publico()
   @Get('formas')
-  formas() {
-    return this.pagamentoService.formas();
+  formas(@Query() filtros: ListarFormasDto) {
+    return this.pagamentoService.formas(filtros);
   }
 
   @Get()
