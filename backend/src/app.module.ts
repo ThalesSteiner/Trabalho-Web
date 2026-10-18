@@ -6,6 +6,7 @@ import{DashboardModule} from './dashboard/dashboard.module';
 import { CategoriaCustoModule } from './categoria-custo/categoria-custo.module';
 import { KnexModule } from './common/database/knex.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
+import { VendaModule } from './venda/venda.module';
 import { TestModule } from './test/test.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { RedisModule } from './common/redis/redis.module';
@@ -25,6 +26,7 @@ import { CatalogoModule } from './catalogo/catalogo.module';
     RateLimitModule,
     AuthModule,
     PagamentoModule,
+    VendaModule,
     CustoModule,
     DashboardModule,
     LojaModule,
