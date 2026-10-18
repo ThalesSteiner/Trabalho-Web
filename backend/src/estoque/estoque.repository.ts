@@ -45,29 +45,33 @@ export class EstoqueRepository {
     return this.selecionarLotes().where({ lojaId, itemId, lote }).first();
   }
 
-  buscarLoteDoDia(dataReferencia: string, lojaId: number, itemId: number, lote: string): Promise<LoteEstoque | undefined> {
-    return this.selecionarLotes().where({ dataReferencia, lojaId, itemId, lote }).first();
+  buscarLoteDoDia(dataReferencia: string, lojaId: number, itemId: number, lote: string, trx: Knex = this.knex): Promise<LoteEstoque | undefined> {
+    return this.selecionarLotes(trx).where({ dataReferencia, lojaId, itemId, lote }).first();
   }
 
   listarLotesDoItem(lojaId: number, itemId: number): Promise<LoteEstoque[]> {
     return this.selecionarLotes().where({ lojaId, itemId }).where('quantidade', '>', 0)
       .orderByRaw('data_validade asc nulls last').orderBy('dataReferencia').orderBy('lote');
   }
-  async registrarEntrada(lote: LoteEstoque) {
-    await this.knex('fat_estoque').insert(lote)
+  async registrarEntrada(lote: LoteEstoque, trx: Knex = this.knex) {
+    await trx('fat_estoque').insert(lote)
       .onConflict(['dataReferencia', 'lojaId', 'itemId', 'lote'])
       .merge({ quantidade: this.knex.raw('fat_estoque.quantidade + excluded.quantidade') });
   }
 
-  async aplicarBaixa(lojaId: number, itemId: number, retiradas: { dataReferencia: string; lote: string; quantidade: number }[]) {
-    await this.knex.transaction(async trx => {
-      for (const retirada of retiradas) {
-        await trx('fat_estoque')
-          .where({ dataReferencia: retirada.dataReferencia, lojaId, itemId, lote: retirada.lote })
-          .decrement('quantidade', retirada.quantidade);
-      }
-      await trx('fat_estoque').where({ lojaId, itemId }).where('quantidade', '<=', 0).delete();
-    });
+  async aplicarBaixa(
+    lojaId: number,
+    itemId: number,
+    retiradas: { dataReferencia: string; lote: string; quantidade: number }[],
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    if (!trx) return this.knex.transaction(t => this.aplicarBaixa(lojaId, itemId, retiradas, t));
+    for (const retirada of retiradas) {
+      await trx('fat_estoque')
+        .where({ dataReferencia: retirada.dataReferencia, lojaId, itemId, lote: retirada.lote })
+        .decrement('quantidade', retirada.quantidade);
+    }
+    await trx('fat_estoque').where({ lojaId, itemId }).where('quantidade', '<=', 0).delete();
   }
   async listarVencidos(lojaId: number, hoje: string) {
     const vencidos: {
@@ -169,8 +173,8 @@ export class EstoqueRepository {
     return consulta;
   }
 
-  private selecionarLotes() {
-    return this.knex('fat_estoque').select(
+  private selecionarLotes(trx: Knex = this.knex) {
+    return trx('fat_estoque').select(
       this.knex.raw(`to_char(data_referencia, 'YYYY-MM-DD') as data_referencia`),
       'lojaId', 'itemId', 'lote', 'quantidade',
       this.knex.raw(`to_char(data_validade, 'YYYY-MM-DD') as data_validade`)

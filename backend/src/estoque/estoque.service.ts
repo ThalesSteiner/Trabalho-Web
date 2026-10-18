@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Knex } from 'knex';
 import { EstoqueRepository } from './estoque.repository';
 import { ListarEstoqueDto, RelatorioEstoqueDto } from './dto/filtros-estoque.dto';
 import { EntradaEstoqueDto } from './dto/entrada-estoque.dto';
@@ -14,7 +15,7 @@ export class EstoqueService {
   listar(filtros: ListarEstoqueDto) {
     return this.repository.listar(filtros);
   }
-  async registrarEntrada(dto: EntradaEstoqueDto) {
+  async registrarEntrada(dto: EntradaEstoqueDto, trx?: Knex.Transaction) {
     const hoje = this.hoje();
     await this.validarLojaEItem(dto.lojaId, dto.itemId);
     if (dto.dataValidade && dto.dataValidade < hoje) {
@@ -31,14 +32,12 @@ export class EstoqueService {
       lote: dto.lote,
       dataValidade: dto.dataValidade ?? null,
       quantidade: dto.quantidade
-    });
-    return this.repository.buscarLoteDoDia(hoje, dto.lojaId, dto.itemId, dto.lote);
+    }, trx);
+    return this.repository.buscarLoteDoDia(hoje, dto.lojaId, dto.itemId, dto.lote, trx);
   }
-  async registrarBaixa(dto: BaixaEstoqueDto) {
-    const hoje = this.hoje();
+  async registrarBaixa(dto: BaixaEstoqueDto, trx?: Knex.Transaction) {
     await this.validarLojaEItem(dto.lojaId, dto.itemId);
-    const lotes = (await this.repository.listarLotesDoItem(dto.lojaId, dto.itemId))
-      .filter(lote => lote.dataValidade === null || lote.dataValidade >= hoje);
+    const lotes = await this.lotesDentroDaValidade(dto.lojaId, dto.itemId);
     const disponivel = lotes.reduce((soma, lote) => soma + lote.quantidade, 0);
     if (disponivel < dto.quantidade) {
       throw new ConflictException(`Estoque insuficiente: há ${disponivel} unidade(s) dentro da validade`);
@@ -51,8 +50,19 @@ export class EstoqueService {
       retiradas.push({ dataReferencia: lote.dataReferencia, lote: lote.lote, quantidade });
       restante -= quantidade;
     }
-    await this.repository.aplicarBaixa(dto.lojaId, dto.itemId, retiradas);
+    await this.repository.aplicarBaixa(dto.lojaId, dto.itemId, retiradas, trx);
     return { retiradas, quantidadeRestante: disponivel - dto.quantidade };
+  }
+  async disponivel(lojaId: number, itemId: number) {
+    const lotes = await this.lotesDentroDaValidade(lojaId, itemId);
+    return lotes.reduce((soma, lote) => soma + lote.quantidade, 0);
+  }
+
+  async devolver(lojaId: number, itemId: number, quantidade: number, trx: Knex.Transaction) {
+    await this.repository.registrarEntrada(
+      { dataReferencia: this.hoje(), lojaId, itemId, lote: 'DEVOLUCAO', dataValidade: null, quantidade },
+      trx
+    );
   }
   async descartarVencidos(dto: DescarteVencidosDto) {
     const hoje = this.hoje();
@@ -87,6 +97,12 @@ export class EstoqueService {
   }
   private hoje() {
     return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+  }
+
+  private async lotesDentroDaValidade(lojaId: number, itemId: number) {
+    const hoje = this.hoje();
+    return (await this.repository.listarLotesDoItem(lojaId, itemId))
+      .filter(lote => lote.dataValidade === null || lote.dataValidade >= hoje);
   }
 
   private async validarLojaEItem(lojaId: number, itemId: number) {
