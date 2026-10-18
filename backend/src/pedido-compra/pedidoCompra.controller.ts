@@ -14,7 +14,7 @@ export class PedidoCompraController {
 
   listar = async (req: Request, res: Response) => {
     try {
-      const pedidos = await this.service.listar();
+      const pedidos = await this.service.listar(req.query);
       return res.status(200).json(pedidos);
     } catch (erro: any) {
       return res.status(erro.status).json({ message: erro.message });
