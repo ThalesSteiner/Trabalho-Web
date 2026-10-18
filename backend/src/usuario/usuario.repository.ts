@@ -95,7 +95,6 @@ export class UsuarioRepository {
     return this.comPerfil(this.knex('usuario as u')).where('u.id', usuarioId).first(colunasPerfil);
   }
 
-  // cliente e funcionário acompanham o perfil do login
   private async ajustarVinculos(trx: Knex.Transaction, usuarioId: string, perfil: Perfil, funcionario: Partial<Funcionario>) {
     if (perfil !== 'CLIENTE') await trx('dim_cliente').where({ usuarioId }).update({ usuarioId: null });
     if (perfil !== 'FUNCIONARIO') {

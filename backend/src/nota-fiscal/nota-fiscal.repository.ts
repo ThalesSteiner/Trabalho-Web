@@ -66,7 +66,6 @@ export class NotaFiscalRepository {
     await this.knex('dim_nota_fiscal').where({ id }).update(dados);
   }
 
-  // vendas continuam, so ficam sem nota (-1)
   async excluir(id: number, trx?: Knex.Transaction): Promise<void> {
     if (!trx) return this.knex.transaction((t) => this.excluir(id, t));
 

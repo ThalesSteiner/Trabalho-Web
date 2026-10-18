@@ -28,7 +28,6 @@ export class CatalogoRepository {
     return this.knex('dim_loja').where({ id }).where('id', '>', 0).first('id', 'nomeLoja', 'nomeCondominio');
   }
 
-  // mesmo preço, promoção e estoque que o pagamento usa na hora da compra
   async itens(lojaId: number, { page, limit, nome, categoria, disponiveis }: ListarCatalogoDto) {
     const filtro = this.knex('dim_item as i')
       .joinRaw(

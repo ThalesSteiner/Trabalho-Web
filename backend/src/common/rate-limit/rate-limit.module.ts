@@ -5,7 +5,6 @@ import { Throttle, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 const minuto = 60_000;
 
-// login e cadastro aceitam menos tentativas por minuto para dificultar força bruta
 export const LimiteLogin = () =>
   Throttle({ default: { ttl: minuto, limit: () => Number(process.env.RATE_LIMIT_LOGIN ?? 5) } });
 

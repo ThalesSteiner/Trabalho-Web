@@ -10,5 +10,4 @@ export const tracer = new NodeSDK({
 
 tracer.start();
 
-// manda para o Jaeger os spans que ainda estão no buffer antes de desligar
 process.once('SIGTERM', () => void tracer.shutdown().finally(() => process.exit(0)));

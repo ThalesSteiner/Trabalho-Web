@@ -18,7 +18,6 @@ export class CacheInterceptor implements NestInterceptor {
     const req = ctx.switchToHttp().getRequest<Request & { usuario?: UsuarioToken }>();
     const res = ctx.switchToHttp().getResponse<Response>();
 
-    // escrita que deu certo limpa o cache todo: uma compra, por exemplo, muda pagamentos, notas, estoque e dashboard
     if (req.method !== 'GET') {
       return next.handle().pipe(mergeMap(async (dados) => {
         await this.medir('cache.limpar', () => this.cache.clear());
@@ -27,7 +26,6 @@ export class CacheInterceptor implements NestInterceptor {
     }
     if (semCache.some((rota) => req.path.startsWith(rota))) return next.handle();
 
-    // a mesma rota devolve coisas diferentes por usuário (ex.: pagamentos do cliente), então a chave leva o usuário
     const chave = `${req.usuario?.sub ?? 'publico'}:${req.originalUrl}`;
     const salvo = await this.medir('cache.ler', () => this.cache.get(chave));
     const achou = salvo !== undefined && salvo !== null;
@@ -41,7 +39,6 @@ export class CacheInterceptor implements NestInterceptor {
     }));
   }
 
-  // cada operação no Redis vira um span no Jaeger; se o Redis falhar ou demorar, a requisição segue sem cache
   private medir<T>(nome: string, operacao: () => Promise<T>) {
     return tracer.startActiveSpan(nome, async (span) => {
       try {

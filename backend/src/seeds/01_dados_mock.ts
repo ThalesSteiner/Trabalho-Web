@@ -80,7 +80,6 @@ const inserir = async (knex: Knex, tabela: string, linhas: Linha[], retorno = 'i
 
 const mapa = (linhas: Linha[], chave: string) => new Map(linhas.map((l) => [String(l[chave]), Number(l.id)]));
 
-// apaga os dados de exemplo e cria de novo, então pode rodar quantas vezes quiser
 export async function seed(knex: Knex) {
   await limpar(knex);
 
@@ -399,7 +398,6 @@ async function limpar(knex: Knex) {
   await knex.raw(`delete from usuario`);
   await knex.raw(`alter sequence nota_fiscal_numero_seq restart`);
 
-  // ids voltam a começar do 1, então cada seed gera sempre os mesmos ids
   for (const tabela of [...fatos, ...dimensoes]) {
     await knex.raw(`alter table ${tabela} alter column id restart`);
   }

@@ -17,7 +17,6 @@ import { CACHE, CacheInterceptor } from './cache.interceptor';
         );
         redis.ttl = Number(config.get('CACHE_TTL', 60)) * 1000;
 
-        // sem Redis a API continua funcionando, só sem cache
         let avisou = false;
         const avisar = () => {
           if (!avisou) new Logger('Redis').warn('Redis indisponível, seguindo sem cache');
