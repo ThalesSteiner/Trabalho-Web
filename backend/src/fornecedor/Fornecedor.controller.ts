@@ -7,7 +7,7 @@ export class FornecedorController {
   constructor(private service: FornecedorService) {}
 
   @Get()
-  listar() { return this.service.listar(); }
+  listar(@Query() query: unknown) {return this.service.listar(query);}
 
   @Get(':id')
   buscarPorId(@Param('id') id: string) { return this.service.buscarPorId(id);}
