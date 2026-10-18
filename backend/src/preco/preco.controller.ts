@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { Perfis } from '../auth/auth.decorators';
 import { AtualizarPrecoDto } from './dto/atualizar-preco.dto';
 import { CriarPrecoDto } from './dto/criar-preco.dto';
-import { HistoricoPrecoDto, ListarPrecosDto } from './dto/listar-precos.dto';
+import { HistoricoPrecoDto, ListarPrecosDto, ItemIdParamDto } from './dto/listar-precos.dto';
 import { PrecoService } from './preco.service';
+import { IdParamDto } from '../common/dto/id-param.dto';
 
 @Perfis('ADMIN')
 @Controller('precos')
@@ -11,7 +12,7 @@ export class PrecoController {
   constructor(private readonly service: PrecoService) {}
 
   @Get('item/:itemId/historico')
-  historico(@Param('itemId', ParseIntPipe) itemId: number, @Query() filtros: HistoricoPrecoDto) {
+  historico(@Param() { itemId }: ItemIdParamDto, @Query() filtros: HistoricoPrecoDto) {
     return this.service.historico(itemId, filtros);
   }
 
@@ -26,17 +27,17 @@ export class PrecoController {
   }
 
   @Get(':id')
-  buscarPorId(@Param('id', ParseIntPipe) id: number) {
+  buscarPorId(@Param() { id }: IdParamDto) {
     return this.service.buscarPorId(id);
   }
 
   @Patch(':id')
-  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: AtualizarPrecoDto) {
+  atualizar(@Param() { id }: IdParamDto, @Body() dto: AtualizarPrecoDto) {
     return this.service.atualizar(id, dto);
   }
 
   @Delete(':id')
-  excluir(@Param('id', ParseIntPipe) id: number) {
+  excluir(@Param() { id }: IdParamDto) {
     return this.service.excluir(id);
   }
 }
