@@ -11,6 +11,7 @@ import { IdParamDto } from '../common/dto/id-param.dto';
 export class PrecoController {
   constructor(private readonly service: PrecoService) {}
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get('item/:itemId/historico')
   historico(@Param() { itemId }: ItemIdParamDto, @Query() filtros: HistoricoPrecoDto) {
     return this.service.historico(itemId, filtros);
@@ -21,11 +22,13 @@ export class PrecoController {
     return this.service.criar(dto);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get()
   listar(@Query() filtros: ListarPrecosDto) {
     return this.service.listar(filtros);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get(':id')
   buscarPorId(@Param() { id }: IdParamDto) {
     return this.service.buscarPorId(id);
