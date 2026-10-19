@@ -13,21 +13,10 @@ export class PedidoCompraController {
     return this.service.listar(query);
   }
 
-<<<<<<< HEAD
-  listar = async (req: Request, res: Response) => {
-    try {
-      const pedidos = await this.service.listar(req.query);
-      return res.status(200).json(pedidos);
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
-=======
   @Get(':id')
   buscarPorId(@Param('id', ParseIntPipe) id: number) {
     return this.service.buscarPorId(id);
   }
->>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
 
   @Post()
   criar(@UsuarioAtual() usuario: UsuarioToken, @Body() dados: CriarPedidoCompraDto) {

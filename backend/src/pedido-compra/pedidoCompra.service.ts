@@ -3,14 +3,8 @@ import { validarAcessoLoja } from '../auth/acesso-loja';
 import type { UsuarioToken } from '../auth/auth.decorators';
 import { EstoqueService } from '../estoque/estoque.service';
 import { PedidoCompraRepository } from './pedidoCompra.repository';
-<<<<<<< HEAD
-import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra,  ResultadoPaginado } from './pedidoCompra.entity';
-import { formasPagamento } from '../common/database/dados-mock';
-import { CriarPedidoCompraDto, AtualizarPedidoCompraDto, ListarPedidosCompraDto, validarDto } from './pedidoCompra.dto';
-=======
 import { PedidoCompra, Promocao, TotalPedidoCompra, ResultadoPaginado } from './pedidoCompra.entity';
 import { CriarPedidoCompraDto, AtualizarPedidoCompraDto, ListarPedidosCompraDto } from './pedidoCompra.dto';
->>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
 
 @Injectable()
 export class PedidoCompraService {
@@ -22,17 +16,8 @@ export class PedidoCompraService {
   async listar(dto: ListarPedidosCompraDto): Promise<ResultadoPaginado<PedidoCompra>> {
     const { pagina, limite, ...filtros } = dto;
 
-<<<<<<< HEAD
-  async listar(query: unknown): Promise<ResultadoPaginado<PedidoCompra>> {
-    const dto = await validarDto(ListarPedidosCompraDto, query);
-    const { pagina, limite, ...filtros } = dto;
-
-    if (filtros.quantidadeMin !== undefined && filtros.quantidadeMax !== undefined && filtros.quantidadeMin > filtros.quantidadeMax) {
-      throw { status: 400, message: 'quantidade mínima não pode ser maior que quantidade máxima' };
-=======
     if (filtros.quantidadeMin !== undefined && filtros.quantidadeMax !== undefined && filtros.quantidadeMin > filtros.quantidadeMax) {
       throw new BadRequestException('quantidade mínima não pode ser maior que quantidade máxima');
->>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
     }
     return this.repository.listar(filtros, pagina ?? 1, limite ?? 10);
   }
@@ -43,17 +28,6 @@ export class PedidoCompraService {
     return pedido;
   }
 
-<<<<<<< HEAD
-  async criar(dados: unknown): Promise<PedidoCompra> {
-    const dto = await validarDto(CriarPedidoCompraDto, dados);
-    return this.repository.criar(dto);
-  }
-
-  async atualizar(id: number, dados: unknown): Promise<PedidoCompra> {
-    const dto = await validarDto(AtualizarPedidoCompraDto, dados);
-    const pedido = await this.repository.atualizar(id, dto);
-    if (!pedido) throw { status: 404, message: 'Pedido de compra não encontrado' };
-=======
   async criar(usuario: UsuarioToken, { lote, dataValidade, ...dados }: CriarPedidoCompraDto): Promise<PedidoCompra> {
     validarAcessoLoja(usuario, dados.lojaId);
     if (!(await this.repository.fornecedorExiste(dados.fornecedorId))) throw new NotFoundException('Fornecedor não encontrado');
@@ -78,7 +52,6 @@ export class PedidoCompraService {
     }
     const pedido = await this.repository.atualizar(id, dto);
     if (!pedido) throw new NotFoundException('Pedido de compra não encontrado');
->>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
     return pedido;
   }
 

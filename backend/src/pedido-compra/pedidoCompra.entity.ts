@@ -33,14 +33,9 @@ export type TotalPedidoCompra = {pedidoId: number;
 };
 
 export type FiltrosPedidoCompra = {
-<<<<<<< HEAD
-  item?: string;
-  formaPagamento?: FormaPagamento;
-=======
   lojaId?: number;
   itemId?: number;
   fornecedorId?: number;
->>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
   quantidadeMin?: number;
   quantidadeMax?: number;
 };
