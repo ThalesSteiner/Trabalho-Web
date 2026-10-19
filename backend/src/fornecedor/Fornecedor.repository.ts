@@ -1,11 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
-import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor } from './Fornecedor.entity';
+import { Fornecedor, FornecedorSemId, AtualizarParcialFornecedor, FiltrosFornecedor, ResultadoPaginado } from './Fornecedor.entity';
 
 @Injectable()
 export class FornecedorRepository {
-  private readonly tabela = 'fornecedores';
+  private readonly tabela = 'dim_fornecedor';
 
   constructor(@Inject(KNEX) private readonly db: Knex) {}
 
@@ -42,7 +42,7 @@ export class FornecedorRepository {
       .first();
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
+      throw new NotFoundException("Fornecedor não encontrado com esse id");
     }
     return fornecedor;
   }
@@ -53,9 +53,15 @@ export class FornecedorRepository {
       .first();
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado com esse cnpj" }
+      throw new NotFoundException("Fornecedor não encontrado com esse cnpj");
     }
     return fornecedor;
+  }
+
+  async cnpjEmUso(cnpj: string, ignorarId?: number): Promise<boolean> {
+    const consulta = this.db<Fornecedor>(this.tabela).where({ cnpj });
+    if (ignorarId) consulta.whereNot({ id: ignorarId });
+    return !!(await consulta.first('id'));
   }
 
   async criar(dados: FornecedorSemId): Promise<Fornecedor> {
@@ -72,7 +78,7 @@ export class FornecedorRepository {
       .returning('*');
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
+      throw new NotFoundException("Fornecedor não encontrado com esse id");
     }
     return fornecedor;
   }
@@ -84,7 +90,7 @@ export class FornecedorRepository {
       .returning('*');
 
     if (!fornecedor) {
-      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
+      throw new NotFoundException("Fornecedor não encontrado com esse id");
     }
     return fornecedor;
   }
@@ -95,17 +101,12 @@ export class FornecedorRepository {
       .delete();
 
     if (quantidade === 0) {
-      throw { status: 404, message: "Fornecedor não encontrado com esse id" }
+      throw new NotFoundException("Fornecedor não encontrado com esse id");
     }
   }
 
     async buscarCategoriasExistentes(id: number, categoriasBuscadas: string[]): Promise<string[]> { //retorna as categorias que existem em tal id
-  const fornecedor = await this.db<Fornecedor>(this.tabela)
-    .where({ id })
-    .first();
-  if (!fornecedor) {
-    return [];
-  }
+  const fornecedor = await this.buscarPorId(id);
   const categoriasFornecedor = fornecedor.categorias;
   return categoriasBuscadas.filter(categoria =>
     categoriasFornecedor.some(

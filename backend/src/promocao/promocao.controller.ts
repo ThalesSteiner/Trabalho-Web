@@ -10,6 +10,7 @@ import { PromocaoService } from './promocao.service';
 export class PromocaoController {
   constructor(private readonly service: PromocaoService) {}
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get('tipos')
   tipos() {
     return this.service.tipos();
@@ -20,11 +21,13 @@ export class PromocaoController {
     return this.service.criar(dto);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get()
   listar(@Query() filtros: ListarPromocoesDto) {
     return this.service.listar(filtros);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get(':id')
   buscarPorId(@Param('id', ParseIntPipe) id: number) {
     return this.service.buscarPorId(id);

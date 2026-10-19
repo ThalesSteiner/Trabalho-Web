@@ -5,6 +5,7 @@ import {EstoqueService} from './estoque.service';
 
 @Module({
   controllers: [EstoqueController],
-  providers: [EstoqueService, EstoqueRepository]
+  providers: [EstoqueService, EstoqueRepository],
+  exports: [EstoqueService]
 })
 export class EstoqueModule {}

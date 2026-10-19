@@ -1,17 +1,19 @@
-import { Request, Response } from 'express'; //agora tentando sem usar decorator pra treinar
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Perfis, UsuarioAtual, type UsuarioToken } from '../auth/auth.decorators';
 import { PedidoCompraService } from './pedidoCompra.service';
+import { AtualizarPedidoCompraDto, CriarPedidoCompraDto, ListarPedidosCompraDto } from './pedidoCompra.dto';
 
+@Perfis('ADMIN', 'FUNCIONARIO')
+@Controller('pedido-compras')
 export class PedidoCompraController {
   constructor(private readonly service: PedidoCompraService) {}
 
-  private lerId(req: Request): number {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id) || id <= 0) {
-      throw { status: 400, message: 'id inválido' };
-    }
-    return id;
+  @Get()
+  listar(@Query() query: ListarPedidosCompraDto) {
+    return this.service.listar(query);
   }
 
+<<<<<<< HEAD
   listar = async (req: Request, res: Response) => {
     try {
       const pedidos = await this.service.listar(req.query);
@@ -20,58 +22,38 @@ export class PedidoCompraController {
       return res.status(erro.status).json({ message: erro.message });
     }
   };
+=======
+  @Get(':id')
+  buscarPorId(@Param('id', ParseIntPipe) id: number) {
+    return this.service.buscarPorId(id);
+  }
+>>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
 
-  buscarPorId = async (req: Request, res: Response) => {
-    try {
-      const pedido = await this.service.buscarPorId(this.lerId(req));
-      return res.status(200).json(pedido);
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
+  @Post()
+  criar(@UsuarioAtual() usuario: UsuarioToken, @Body() dados: CriarPedidoCompraDto) {
+    return this.service.criar(usuario, dados);
+  }
 
-  criar = async (req: Request, res: Response) => {
-    try {
-      const pedido = await this.service.criar(req.body);
-      return res.status(201).json(pedido);
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
+  @Perfis('ADMIN')
+  @Put(':id')
+  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dados: AtualizarPedidoCompraDto) {
+    return this.service.atualizar(id, dados);
+  }
 
-  atualizar = async (req: Request, res: Response) => {
-    try {
-      const pedido = await this.service.atualizar(this.lerId(req), req.body);
-      return res.status(200).json(pedido);
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
+  @Perfis('ADMIN')
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remover(@Param('id', ParseIntPipe) id: number) {
+    return this.service.remover(id);
+  }
 
-  remover = async (req: Request, res: Response) => {
-    try {
-      await this.service.remover(this.lerId(req));
-      return res.status(204).send();
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
+  @Get(':id/promocao') //esse volta se tem uma promoção com o item de tal id
+  buscarPromocao(@Param('id', ParseIntPipe) id: number) {
+    return this.service.buscarPromocao(id);
+  }
 
-  buscarPromocao = async (req: Request, res: Response) => {
-    try {
-      const promocao = await this.service.buscarPromocao(this.lerId(req));
-      return res.status(200).json(promocao);
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
-
-  calcularTotal = async (req: Request, res: Response) => {
-    try {
-      const total = await this.service.calcularTotal(this.lerId(req));
-      return res.status(200).json(total);
-    } catch (erro: any) {
-      return res.status(erro.status).json({ message: erro.message });
-    }
-  };
+  @Get(':id/total') //esse volta o custo total do pedido-compra
+  calcularTotal(@Param('id', ParseIntPipe) id: number) {
+    return this.service.calcularTotal(id);
+  }
 }

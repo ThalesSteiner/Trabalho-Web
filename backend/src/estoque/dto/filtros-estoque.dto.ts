@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import { IsDateString, Matches, Max, MaxLength,IsInt, IsString, Min, ValidateIf } from 'class-validator';
+import { IsDateString, Matches, Max, MaxLength, IsInt, IsString, Min, ValidateIf } from 'class-validator';
 
 export class ListarEstoqueDto {
   @ValidateIf((_obj, value) => value !== undefined)
@@ -42,7 +42,14 @@ export class RelatorioEstoqueDto {
   lojaId?: number;
 
   @ValidateIf((_obj, value) => value !== undefined)
-  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(Number.MAX_SAFE_INTEGER)
+  itemId?: number;
+
+  @ValidateIf((_obj, value) => value !== undefined)
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MaxLength(80)
   categoria?: string;

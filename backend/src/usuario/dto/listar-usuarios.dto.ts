@@ -27,4 +27,9 @@ export class ListarUsuariosDto {
   @IsOptional()
   @IsIn(['ADMIN', 'CLIENTE', 'FUNCIONARIO'])
   perfil?: Perfil;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  lojaId?: number;
 }

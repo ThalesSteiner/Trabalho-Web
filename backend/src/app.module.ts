@@ -6,6 +6,7 @@ import{DashboardModule} from './dashboard/dashboard.module';
 import { CategoriaCustoModule } from './categoria-custo/categoria-custo.module';
 import { KnexModule } from './common/database/knex.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
+import { VendaModule } from './venda/venda.module';
 import { TestModule } from './test/test.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { RedisModule } from './common/redis/redis.module';
@@ -16,6 +17,8 @@ import{EstoqueModule} from './estoque/estoque.module';
 import { PrecoModule } from './preco/preco.module';
 import { ItemModule } from './item/item.module';
 import { CatalogoModule } from './catalogo/catalogo.module';
+import { FornecedorModule } from './fornecedor/Fornecedor.module';
+import { PedidoCompraModule } from './pedido-compra/pedidoCompra.module';
 
 @Module({
   imports: [
@@ -25,6 +28,7 @@ import { CatalogoModule } from './catalogo/catalogo.module';
     RateLimitModule,
     AuthModule,
     PagamentoModule,
+    VendaModule,
     CustoModule,
     DashboardModule,
     LojaModule,
@@ -35,6 +39,8 @@ import { CatalogoModule } from './catalogo/catalogo.module';
     PrecoModule,
     ItemModule,
     CatalogoModule,
+    FornecedorModule,
+    PedidoCompraModule,
   ],
 })
 export class AppModule implements NestModule {

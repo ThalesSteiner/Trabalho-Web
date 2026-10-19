@@ -1,44 +1,49 @@
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { validarAcessoLoja } from '../auth/acesso-loja';
+import type { UsuarioToken } from '../auth/auth.decorators';
+import { EstoqueService } from '../estoque/estoque.service';
 import { PedidoCompraRepository } from './pedidoCompra.repository';
+<<<<<<< HEAD
 import { PedidoCompra, CriarPedidoCompra, AtualizarPedidoCompra, Promocao, TotalPedidoCompra,  ResultadoPaginado } from './pedidoCompra.entity';
 import { formasPagamento } from '../common/database/dados-mock';
 import { CriarPedidoCompraDto, AtualizarPedidoCompraDto, ListarPedidosCompraDto, validarDto } from './pedidoCompra.dto';
+=======
+import { PedidoCompra, Promocao, TotalPedidoCompra, ResultadoPaginado } from './pedidoCompra.entity';
+import { CriarPedidoCompraDto, AtualizarPedidoCompraDto, ListarPedidosCompraDto } from './pedidoCompra.dto';
+>>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
 
+@Injectable()
 export class PedidoCompraService {
-  constructor(private readonly repository: PedidoCompraRepository) {}
+  constructor(
+    private readonly repository: PedidoCompraRepository,
+    private readonly estoqueService: EstoqueService,
+  ) {}
 
-  private validar(dados: AtualizarPedidoCompra, completo: boolean): void {
-    if (completo) {
-      if (!dados.item || !dados.quantidade || !dados.formaPagamento) {
-        throw { status: 500, message: 'Todos os campos são obrigatórios' };
-      }
-    }
-    if (dados.item !== undefined && dados.item.trim() === '') {
-      throw { status: 500, message: 'item não pode ser vazio' };
-    }
-    if (dados.quantidade !== undefined && (!Number.isInteger(dados.quantidade) || dados.quantidade <= 0)) {
-      throw { status: 500, message: 'quantidade deve ser um número inteiro maior que zero' };
-    }
-    if (dados.formaPagamento !== undefined && !formasPagamento.includes(dados.formaPagamento)) {
-      throw { status: 500, message: 'forma de pagamento inválida.' };
-    }
-  }
+  async listar(dto: ListarPedidosCompraDto): Promise<ResultadoPaginado<PedidoCompra>> {
+    const { pagina, limite, ...filtros } = dto;
 
+<<<<<<< HEAD
   async listar(query: unknown): Promise<ResultadoPaginado<PedidoCompra>> {
     const dto = await validarDto(ListarPedidosCompraDto, query);
     const { pagina, limite, ...filtros } = dto;
 
     if (filtros.quantidadeMin !== undefined && filtros.quantidadeMax !== undefined && filtros.quantidadeMin > filtros.quantidadeMax) {
       throw { status: 400, message: 'quantidade mínima não pode ser maior que quantidade máxima' };
+=======
+    if (filtros.quantidadeMin !== undefined && filtros.quantidadeMax !== undefined && filtros.quantidadeMin > filtros.quantidadeMax) {
+      throw new BadRequestException('quantidade mínima não pode ser maior que quantidade máxima');
+>>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
     }
     return this.repository.listar(filtros, pagina ?? 1, limite ?? 10);
   }
 
   async buscarPorId(id: number): Promise<PedidoCompra> {
     const pedido = await this.repository.buscarPorId(id);
-    if (!pedido) throw { status: 404, message: 'Pedido de compra não encontrado' };
+    if (!pedido) throw new NotFoundException('Pedido de compra não encontrado');
     return pedido;
   }
 
+<<<<<<< HEAD
   async criar(dados: unknown): Promise<PedidoCompra> {
     const dto = await validarDto(CriarPedidoCompraDto, dados);
     return this.repository.criar(dto);
@@ -48,32 +53,61 @@ export class PedidoCompraService {
     const dto = await validarDto(AtualizarPedidoCompraDto, dados);
     const pedido = await this.repository.atualizar(id, dto);
     if (!pedido) throw { status: 404, message: 'Pedido de compra não encontrado' };
+=======
+  async criar(usuario: UsuarioToken, { lote, dataValidade, ...dados }: CriarPedidoCompraDto): Promise<PedidoCompra> {
+    validarAcessoLoja(usuario, dados.lojaId);
+    if (!(await this.repository.fornecedorExiste(dados.fornecedorId))) throw new NotFoundException('Fornecedor não encontrado');
+
+    const funcionarioId = usuario.perfil === 'FUNCIONARIO' ? await this.repository.funcionarioDoUsuario(usuario.sub) : -1;
+    const dataRecebimento = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+
+    const id = await this.repository.transacao(async (trx) => {
+      await this.estoqueService.registrarEntrada({ lojaId: dados.lojaId, itemId: dados.itemId, lote, dataValidade, quantidade: dados.quantidade }, trx);
+      return this.repository.criar({ ...dados, dataRecebimento, funcionarioId }, trx);
+    });
+    return this.buscarPorId(id);
+  }
+
+  async atualizar(id: number, dto: AtualizarPedidoCompraDto): Promise<PedidoCompra> {
+    if (dto.fornecedorId === undefined && dto.custoUnitario === undefined) {
+      throw new BadRequestException('Informe no mínimo um campo para ser atualizado');
+    }
+    await this.buscarPorId(id);
+    if (dto.fornecedorId !== undefined && !(await this.repository.fornecedorExiste(dto.fornecedorId))) {
+      throw new NotFoundException('Fornecedor não encontrado');
+    }
+    const pedido = await this.repository.atualizar(id, dto);
+    if (!pedido) throw new NotFoundException('Pedido de compra não encontrado');
+>>>>>>> dfec6202250c98aa1e48b7658169e770669d7ed9
     return pedido;
   }
 
   async remover(id: number): Promise<void> {
-    const removido = await this.repository.remover(id);
-    if (!removido) throw { status: 404, message: 'Pedido de compra não encontrado' };
+    const pedido = await this.buscarPorId(id);
+    await this.repository.transacao(async (trx) => {
+      await this.estoqueService.registrarBaixa({ lojaId: pedido.lojaId, itemId: pedido.itemId, quantidade: pedido.quantidade }, trx);
+      await this.repository.remover(id, trx);
+    });
   }
 
   async buscarPromocao(id: number): Promise<Promocao> {
     const pedido = await this.buscarPorId(id);
-    const promocao = await this.repository.buscarPromocaoPorItem(pedido.item);
-    if (!promocao) throw {status: 404, message: 'Item do pedido não possui promoções'};
+    const promocao = await this.repository.buscarPromocaoPorItem(pedido.itemId);
+    if (!promocao) throw new NotFoundException('Item do pedido não possui promoções');
     return promocao;
   }
 
   async calcularTotal(id: number): Promise<TotalPedidoCompra> {
     const pedido = await this.buscarPorId(id);
-    const item = await this.repository.buscarItemPorNome(pedido.item);
-    if (!item) throw {status: 404, message: 'Item do pedido não encontrado na tabela de itens'};
-    const totalEmCentavos = Math.round(item.preco * 100) * pedido.quantidade;
+    const item = await this.repository.buscarNomeDoItem(pedido.itemId);
+    if (!item) throw new NotFoundException('Item do pedido não encontrado na tabela de itens');
+    const totalEmCentavos = Math.round(pedido.custoUnitario * 100) * pedido.quantidade;
 
     return {
       pedidoId: pedido.id,
-      item: pedido.item,
+      item,
       quantidade: pedido.quantidade,
-      precoUnitario: item.preco,
+      custoUnitario: pedido.custoUnitario,
       total: totalEmCentavos / 100
     };
   }

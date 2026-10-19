@@ -15,11 +15,13 @@ export class LojaController {
     return this.service.criar(dto);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get()
   listar(@Query() filtros: ListarLojasDto) {
     return this.service.listar(filtros);
   }
 
+  @Perfis('ADMIN', 'FUNCIONARIO')
   @Get(':id')
   buscarPorId(@Param('id', ParseIntPipe) id: number) {
     return this.service.buscarPorId(id);
