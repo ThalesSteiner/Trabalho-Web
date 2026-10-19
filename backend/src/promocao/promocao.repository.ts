@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
 import { KNEX } from '../common/database/knex.module';
-import { ListarPromocoesDto } from './dto/listar-promocoes.dto';
+import { ListarPromocoesDto, ListarTiposPromocaoDto } from './dto/listar-promocoes.dto';
 import type { DadosPromocao, Promocao } from './promocao.types';
 
 @Injectable()
@@ -12,8 +12,14 @@ export class PromocaoRepository {
     return this.knex.transaction(executar);
   }
 
-  tipos() {
-    return this.knex('tipo_promocao').select('id', 'nome').orderBy('nome');
+  async tipos(filtros: ListarTiposPromocaoDto) {
+    const consulta = this.knex('tipo_promocao');
+    if (filtros.id !== undefined) consulta.where('id', filtros.id);
+    if (filtros.nome) consulta.whereILike('nome', `%${filtros.nome}%`);
+    const [{ total }] = await consulta.clone().count({ total: '*' });
+    const data = await consulta.select('id', 'nome').orderBy('nome').orderBy('id')
+      .offset((filtros.page - 1) * filtros.limit).limit(filtros.limit);
+    return { data, total: Number(total), page: filtros.page, limit: filtros.limit };
   }
 
   async listar(filtros: ListarPromocoesDto) {

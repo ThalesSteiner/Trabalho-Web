@@ -26,10 +26,12 @@ export class CriarPromocaoDto {
   @IsOptional()
   @IsInt()
   @Min(1)
+  @Max(2 ** 31 - 1)
   qtdLeve?: number | null;
 
   @IsOptional()
   @IsInt()
   @Min(1)
+  @Max(2 ** 31 - 1)
   qtdPague?: number | null;
 }

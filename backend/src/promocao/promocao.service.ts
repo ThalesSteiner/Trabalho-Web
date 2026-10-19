@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { AtualizarPromocaoDto } from './dto/atualizar-promocao.dto';
 import { CriarPromocaoDto } from './dto/criar-promocao.dto';
-import { ListarPromocoesDto } from './dto/listar-promocoes.dto';
+import { ListarPromocoesDto, ListarTiposPromocaoDto } from './dto/listar-promocoes.dto';
 import { PromocaoRepository } from './promocao.repository';
 import type { DadosPromocao } from './promocao.types';
 
@@ -9,8 +9,8 @@ import type { DadosPromocao } from './promocao.types';
 export class PromocaoService {
   constructor(private readonly repository: PromocaoRepository) {}
 
-  tipos() {
-    return this.repository.tipos();
+  tipos(filtros: ListarTiposPromocaoDto) {
+    return this.repository.tipos(filtros);
   }
 
   listar(filtros: ListarPromocoesDto) {
@@ -18,7 +18,6 @@ export class PromocaoService {
   }
 
   async buscarPorId(id: number) {
-    this.validarId(id);
     const promocao = await this.repository.buscarPorId(id);
     if (!promocao) throw new NotFoundException('Promoção não encontrada');
     return promocao;
@@ -38,7 +37,6 @@ export class PromocaoService {
   async atualizar(id: number, dto: AtualizarPromocaoDto) {
     const anterior = await this.buscarPorId(id);
     const campos = Object.fromEntries(Object.entries(dto).filter(([, valor]) => valor !== undefined));
-    if (!Object.keys(campos).length) throw new BadRequestException('Informe pelo menos um campo para atualizar');
     return this.repository.transacao(async trx => {
       await this.repository.bloquearItem(anterior.itemId, trx);
       const atual = await this.repository.buscarPorId(id, trx);
@@ -68,10 +66,6 @@ export class PromocaoService {
       }
       throw erro;
     }
-  }
-
-  private validarId(id: number) {
-    if (!Number.isSafeInteger(id) || id <= 0) throw new BadRequestException('Informe um ID positivo válido');
   }
 
   private validarDados(dto: CriarPromocaoDto): DadosPromocao {
