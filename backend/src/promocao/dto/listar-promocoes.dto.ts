@@ -7,13 +7,13 @@ export class ListarTiposPromocaoDto {
   @IsInt()
   @Min(1)
   @Max(Number.MAX_SAFE_INTEGER)
-  page = number = 1;
+  page: number = 1;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit = number = 10;
+  limit: number = 10;
 
   @ValidateIf((_obj, value) => value !== undefined)
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
@@ -33,13 +33,13 @@ export class ListarPromocoesDto {
   @IsInt()
   @Min(1)
   @Max(Number.MAX_SAFE_INTEGER)
-  page = number = 1;
+  page: number = 1;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit = number = 10;
+  limit: number = 10;
 
   @ValidateIf((_obj, value) => value !== undefined)
   @Type(() => Number)
