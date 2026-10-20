@@ -49,11 +49,11 @@ export class ListarCustosDto extends FiltrosCustoDto {
   @IsInt()
   @Min(1)
   @Max(Number.MAX_SAFE_INTEGER)
-  page = 1;
+  page: number = 1;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit = 10;
+  limit: number = 10;
 }
