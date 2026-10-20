@@ -14,7 +14,7 @@ export class PromocaoController {
   constructor(private readonly service: PromocaoService) {}
 
   @Get('tipos')
-  @ApiOperation({ summary: 'Listar tipos de promoção com paginação e filtros por id e nome' })
+  @ApiOperation({ summary: 'Listar tipos de promoção por id e nome' })
   tipos(@Query() filtros: ListarTiposPromocaoDto) {
     return this.service.tipos(filtros);
   }
@@ -26,7 +26,7 @@ export class PromocaoController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar promoções com paginação e filtros por item e tipo' })
+  @ApiOperation({ summary: 'Listar promoções por item e tipo' })
   listar(@Query() filtros: ListarPromocoesDto) {
     return this.service.listar(filtros);
   }
